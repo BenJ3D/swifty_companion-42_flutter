@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:oauth2_client/oauth2_helper.dart';
+import 'package:swifty_companion/MyOAuth2Client.dart';
+
+import 'authentification42.dart';
 
 void main() async {
   await dotenv.load(fileName: ".env");
+
   runApp(const MyApp());
 }
 
@@ -24,6 +29,7 @@ class MyApp extends StatelessWidget {
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
+
   final String title;
 
   @override
@@ -31,7 +37,16 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  void loginFunction() {
+  void loginFunction() async {
+    final oauth2Client = Oauth2Client42();
+
+    // Appelez fetchFiles (vous voudrez peut-être le faire à un moment plus approprié dans votre app)
+    try {
+      await oauth2Client.fetchFiles();
+    } catch (e) {
+      print('Une erreur est survenue lors de l\'authentification: $e');
+    }
+
     print(dotenv.env['CLIENT_UID']);
   }
 
