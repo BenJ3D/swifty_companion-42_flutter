@@ -18,8 +18,30 @@ class Oauth2Client42 {
       clientSecret: dotenv.env["CLIENT_SECRET"].toString(),
     );
 
-    var resp = await hlp.get('https://api.intra.42.fr/v2/me');
 
-    print(resp.body);
+
+
+    print("CLIENT_UID: ${dotenv.env['CLIENT_UID']}");
+    print("CLIENT_SECRET: ${dotenv.env['CLIENT_SECRET']}");
+    print("URI42: ${dotenv.env['URI42']}");
+
+    var token;
+    try {
+      print("Requesting token with client_id: ${dotenv.env["CLIENT_UID"]}");
+      token = await hlp.getToken();
+      print("Token: ${token.accessToken}");
+    } catch (e) {
+      print('Erreur lors de la récupération du token: $e');
+      return;
+    }
+
+    var resp;
+    try {
+      resp = await hlp.get('https://api.intra.42.fr/v2/me');
+      print("rep = ${resp.body}");
+    } catch (e) {
+      print('Erreur lors de la requête: $e');
+    }
   }
+
 }

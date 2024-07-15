@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:oauth2_client/oauth2_helper.dart';
 import 'package:swifty_companion/MyOAuth2Client.dart';
-
+import 'package:url_launcher/url_launcher.dart';
 import 'authentification42.dart';
 
 void main() async {
@@ -37,6 +37,24 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  // void loginFunction() async {
+  //   final oauth2Client = Oauth2Client42();
+  //
+  //   try {
+  //     final authorizationUrl = Uri.parse(
+  //         'https://api.intra.42.fr/oauth/authorize?client_id=${dotenv.env["CLIENT_UID"]}&redirect_uri=${dotenv.env["URI42"]}&response_type=code&scope=public&state=marandomstringtest');
+  //
+  //     if (await canLaunch(authorizationUrl.toString())) {
+  //       await launch(authorizationUrl.toString());
+  //     } else {
+  //       throw 'Could not launch $authorizationUrl';
+  //     }
+  //   } catch (e) {
+  //     print('Une erreur est survenue lors de l\'authentification: $e');
+  //   }
+  // }
+
+
   void loginFunction() async {
     final oauth2Client = Oauth2Client42();
 
