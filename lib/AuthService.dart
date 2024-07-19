@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:swifty_companion/TokenService.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:app_links/app_links.dart';
 import 'package:http/http.dart' as http;
@@ -41,8 +42,10 @@ class AuthToken {
 class AuthService {
   late AppLinks _appLinks;
   StreamSubscription<Uri>? _sub;
+  late TokenService tokenService = TokenService();
 
   AuthService();
+
 
   Future<void> init() async {
     await initAppLinks();
@@ -81,6 +84,8 @@ class AuthService {
       final token = await _exchangeCodeForToken(code);
       // Utilisez le token comme vous le souhaitez
       print('Token obtenu: ${token.accessToken}');
+      tokenService.saveToken(token.accessToken);
+      tokenService.saveRefreshToken(token.refreshToken);
     } catch (e) {
       print('Erreur lors de l\'obtention du token: $e');
     }
