@@ -7,6 +7,8 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:app_links/app_links.dart';
 import 'package:http/http.dart' as http;
 
+import 'homePage.dart';
+
 class AuthToken {
   final String accessToken;
   final String tokenType;
@@ -47,16 +49,16 @@ class AuthService {
   AuthService();
 
 
-  Future<void> init() async {
-    await initAppLinks();
+  Future<void> init(BuildContext context) async {
+    await initAppLinks(context);
   }
 
-  Future<void> initAppLinks() async {
+  Future<void> initAppLinks(BuildContext context) async {
     _appLinks = AppLinks();
 
     _sub = _appLinks.uriLinkStream.listen((Uri? uri) {
       if (uri != null) {
-        _handleIncomingLink(uri);
+        _handleIncomingLink(uri, context);
       }
     }, onError: (err) {
       debugPrint('Erreur: $err');
@@ -64,31 +66,40 @@ class AuthService {
 
     try {
       final initialUri = await _appLinks.getInitialLink();
-      if (initialUri != null) {
-        _handleIncomingLink(initialUri);
+      if (initialUri != null && context.mounted) {
+        _handleIncomingLink(initialUri, context);
       }
     } catch (e) {
       debugPrint('Erreur lors de la récupération du lien initial: $e');
     }
   }
 
-  void _handleIncomingLink(Uri uri) {
+  void _handleIncomingLink(Uri uri, BuildContext context) {
     final code = uri.queryParameters['code'];
     if (code != null) {
-      _handleCode(code);
+      _handleCode(code, context);
     }
   }
 
-  Future<void> _handleCode(String code) async {
+  Future<void> _handleCode(String code, BuildContext context) async {
     try {
       final token = await _exchangeCodeForToken(code);
       // Utilisez le token comme vous le souhaitez
       print('Token obtenu: ${token.accessToken}');
-      tokenService.saveToken(token.accessToken);
-      tokenService.saveRefreshToken(token.refreshToken);
+      await tokenService.saveToken(token.accessToken);
+      await tokenService.saveRefreshToken(token.refreshToken);
+      if(context.mounted) {
+        _loginSuccess(context);
+      }
     } catch (e) {
       print('Erreur lors de l\'obtention du token: $e');
     }
+  }
+
+  void _loginSuccess(BuildContext context) {
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (context) => const HomePage()),
+    );
   }
 
   Future<AuthToken> _exchangeCodeForToken(String code) async {
@@ -121,4 +132,5 @@ class AuthService {
   void dispose() {
     _sub?.cancel();
   }
+
 }

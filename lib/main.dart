@@ -40,7 +40,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
     _authService = AuthService();
-    _authService.init();
+    _authService.init(context);
   }
 
   @override
