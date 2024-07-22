@@ -5,14 +5,26 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Home Page'),
-      ),
-      body: const Center(
-        child: Text(
-          'Welcome to the Home Page!',
-          style: TextStyle(fontSize: 24),
+    return MaterialApp(
+      home: DefaultTabController(
+        length: 2,
+        child: Scaffold(
+          appBar: AppBar(
+            bottom: const TabBar(tabs: [
+              Tab(text: 'Cat'),
+              Tab(text: 'Dogg'),
+            ]),
+          ),
+          body: const TabBarView(
+            children: <Widget>[
+              Center(
+                child: Text("It's cloudy here"),
+              ),
+              Center(
+                child: Text("It's rainy here"),
+              ),
+            ],
+          ),
         ),
       ),
     );
