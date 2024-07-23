@@ -2,12 +2,12 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:swifty_companion/TokenService.dart';
+import 'package:swifty_companion/services/TokenService.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:app_links/app_links.dart';
 import 'package:http/http.dart' as http;
 
-import 'homePage.dart';
+import '../components/homePage.dart';
 
 class AuthToken {
   final String accessToken;
@@ -48,7 +48,6 @@ class AuthService {
 
   AuthService();
 
-
   Future<void> init(BuildContext context) async {
     await initAppLinks(context);
   }
@@ -88,7 +87,7 @@ class AuthService {
       print('Token obtenu: ${token.accessToken}');
       await tokenService.saveToken(token.accessToken);
       await tokenService.saveRefreshToken(token.refreshToken);
-      if(context.mounted) {
+      if (context.mounted) {
         _loginSuccess(context);
       }
     } catch (e) {
@@ -132,5 +131,4 @@ class AuthService {
   void dispose() {
     _sub?.cancel();
   }
-
 }

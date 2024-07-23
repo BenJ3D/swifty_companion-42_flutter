@@ -1,10 +1,15 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'AuthService.dart';
+import 'package:swifty_companion/services/TokenInterceptor.dart';
+import 'services/AuthService.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");
+  final dio = Dio();
+  dio.interceptors.add(AuthInterceptor());
+
   runApp(const MyApp());
 }
 
