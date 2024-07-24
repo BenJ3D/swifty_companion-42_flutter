@@ -70,48 +70,88 @@ class User42 {
   });
 
   factory User42.fromJson(Map<String, dynamic> json) {
-    return User42(
-      id: json['id'],
-      email: json['email'],
-      login: json['login'],
-      firstName: json['first_name'],
-      lastName: json['last_name'],
-      usualFullName: json['usual_full_name'],
-      usualFirstName: json['usual_first_name'],
-      url: json['url'],
-      displayName: json['displayname'],
-      isStaff: json['staff?'],
-      correctionPoint: json['correction_point'],
-      poolMonth: json['pool_month'],
-      poolYear: json['pool_year'],
-      location: json['location'],
-      wallet: json['wallet'],
-      anonymizeDate: DateTime.parse(json['anonymize_date']),
-      dataErasureDate: DateTime.parse(json['data_erasure_date']),
-      createdAt: DateTime.parse(json['created_at']),
-      updatedAt: DateTime.parse(json['updated_at']),
-      alumnizedAt: json['alumnized_at'] != null
-          ? DateTime.parse(json['alumnized_at'])
-          : null,
-      isAlumni: json['alumni?'],
-      isActive: json['active?'],
-      groups: List<dynamic>.from(json['groups'].map((x) => x)),
-      image: ImageProfile.fromJson(json['image']),
-      cursusUsers: List<CursusUser>.from(
-          json['cursus_users'].map((x) => CursusUser.fromJson(x))),
-      projectsUsers: List<ProjectUser>.from(
-          json['projects_users'].map((x) => ProjectUser.fromJson(x))),
-      languagesUsers: List<LanguageUser>.from(
-          json['languages_users'].map((x) => LanguageUser.fromJson(x))),
-      achievements: List<Achievement>.from(
-          json['achievements'].map((x) => Achievement.fromJson(x))),
-      titles: List<Title>.from(json['titles'].map((x) => Title.fromJson(x))),
-      titlesUsers: List<TitleUser>.from(
-          json['titles_users'].map((x) => TitleUser.fromJson(x))),
-      campus: List<Campus>.from(json['campus'].map((x) => Campus.fromJson(x))),
-      campusUsers: List<CampusUser>.from(
-          json['campus_users'].map((x) => CampusUser.fromJson(x))),
-    );
+    print('Parsing User42 from JSON');
+    try {
+      return User42(
+        id: json['id'] is int ? json['id'] : int.parse(json['id'].toString()),
+        email: json['email'] ?? '',
+        login: json['login'] ?? '',
+        firstName: json['first_name'] ?? '',
+        lastName: json['last_name'] ?? '',
+        usualFullName: json['usual_full_name'] ?? '',
+        usualFirstName: json['usual_first_name'],
+        url: json['url'] ?? '',
+        displayName: json['displayname'] ?? '',
+        isStaff: json['staff?'] ?? false,
+        correctionPoint: json['correction_point'] is int
+            ? json['correction_point']
+            : int.parse(json['correction_point'].toString()),
+        poolMonth: json['pool_month'] ?? '',
+        poolYear: json['pool_year'] is int
+            ? json['pool_year']
+            : int.parse(json['pool_year'].toString()),
+        location: json['location'] ?? '',
+        wallet: json['wallet'] is int
+            ? json['wallet']
+            : int.parse(json['wallet'].toString()),
+        anonymizeDate: json['anonymize_date'] != null
+            ? DateTime.parse(json['anonymize_date'])
+            : DateTime.now(),
+        dataErasureDate: json['data_erasure_date'] != null
+            ? DateTime.parse(json['data_erasure_date'])
+            : DateTime.now(),
+        createdAt: json['created_at'] != null
+            ? DateTime.parse(json['created_at'])
+            : DateTime.now(),
+        updatedAt: json['updated_at'] != null
+            ? DateTime.parse(json['updated_at'])
+            : DateTime.now(),
+        alumnizedAt: json['alumnized_at'] != null
+            ? DateTime.parse(json['alumnized_at'])
+            : null,
+        isAlumni: json['alumni?'] ?? false,
+        isActive: json['active?'] ?? false,
+        groups: List<dynamic>.from(json['groups'] ?? []),
+        image: ImageProfile.fromJson(json['image'] ?? {}),
+        cursusUsers: (json['cursus_users'] as List<dynamic>?)
+                ?.map((x) => CursusUser.fromJson(x))
+                .toList() ??
+            [],
+        projectsUsers: (json['projects_users'] as List<dynamic>?)
+                ?.map((x) => ProjectUser.fromJson(x))
+                .toList() ??
+            [],
+        languagesUsers: (json['languages_users'] as List<dynamic>?)
+                ?.map((x) => LanguageUser.fromJson(x))
+                .toList() ??
+            [],
+        achievements: (json['achievements'] as List<dynamic>?)
+                ?.map((x) => Achievement.fromJson(x))
+                .toList() ??
+            [],
+        titles: (json['titles'] as List<dynamic>?)
+                ?.map((x) => Title.fromJson(x))
+                .toList() ??
+            [],
+        titlesUsers: (json['titles_users'] as List<dynamic>?)
+                ?.map((x) => TitleUser.fromJson(x))
+                .toList() ??
+            [],
+        campus: (json['campus'] as List<dynamic>?)
+                ?.map((x) => Campus.fromJson(x))
+                .toList() ??
+            [],
+        campusUsers: (json['campus_users'] as List<dynamic>?)
+                ?.map((x) => CampusUser.fromJson(x))
+                .toList() ??
+            [],
+      );
+    } catch (e, stackTrace) {
+      print('Error parsing User42: $e');
+      print('Stack trace: $stackTrace');
+      print('JSON: $json');
+      rethrow;
+    }
   }
 }
 

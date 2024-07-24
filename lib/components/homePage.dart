@@ -71,10 +71,13 @@ class _HomePageState extends State<HomePage> {
       Response response = await dio.get('https://api.intra.42.fr/v2/me');
       print('${response.data['login']}');
       setState(() {
-        // userSelected = User42.fromJson(response.data);
-        userSelected.login = response.data['login'];
-        userSelected.image.versions.medium =
-            response.data['image']['versions']['large'];
+        print('*******************WAAAAAAAAAAHHHH**********************');
+        userSelected = User42.fromJson(response.data);
+        // userSelected.login = response.data['login'];
+        // userSelected.image.versions.medium =
+        //     response.data['image']['versions']['large'];
+
+        print('*******************${userSelected.login}**********************');
       });
     } catch (e) {
       print('Error: $e');
