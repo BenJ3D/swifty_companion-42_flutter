@@ -46,6 +46,7 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
     _authService = AuthService();
     _authService.init(context);
+    print('init MyHomePage');
   }
 
   @override
