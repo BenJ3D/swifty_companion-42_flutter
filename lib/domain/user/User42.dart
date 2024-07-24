@@ -7,6 +7,7 @@ class User42 {
   String firstName;
   String lastName;
   String usualFullName;
+  String? usualFirstName;
   String url;
   String displayName;
   bool isStaff;
@@ -19,8 +20,11 @@ class User42 {
   DateTime dataErasureDate;
   DateTime createdAt;
   DateTime updatedAt;
+  DateTime? alumnizedAt;
   bool isAlumni;
   bool isActive;
+  List<dynamic> groups;
+  ImageProfile image;
   List<CursusUser> cursusUsers;
   List<ProjectUser> projectsUsers;
   List<LanguageUser> languagesUsers;
@@ -37,6 +41,7 @@ class User42 {
     required this.firstName,
     required this.lastName,
     required this.usualFullName,
+    this.usualFirstName,
     required this.url,
     required this.displayName,
     required this.isStaff,
@@ -49,8 +54,11 @@ class User42 {
     required this.dataErasureDate,
     required this.createdAt,
     required this.updatedAt,
+    this.alumnizedAt,
     required this.isAlumni,
     required this.isActive,
+    required this.groups,
+    required this.image,
     required this.cursusUsers,
     required this.projectsUsers,
     required this.languagesUsers,
@@ -69,6 +77,7 @@ class User42 {
       firstName: json['first_name'],
       lastName: json['last_name'],
       usualFullName: json['usual_full_name'],
+      usualFirstName: json['usual_first_name'],
       url: json['url'],
       displayName: json['displayname'],
       isStaff: json['staff?'],
@@ -81,8 +90,13 @@ class User42 {
       dataErasureDate: DateTime.parse(json['data_erasure_date']),
       createdAt: DateTime.parse(json['created_at']),
       updatedAt: DateTime.parse(json['updated_at']),
+      alumnizedAt: json['alumnized_at'] != null
+          ? DateTime.parse(json['alumnized_at'])
+          : null,
       isAlumni: json['alumni?'],
       isActive: json['active?'],
+      groups: List<dynamic>.from(json['groups'].map((x) => x)),
+      image: ImageProfile.fromJson(json['image']),
       cursusUsers: List<CursusUser>.from(
           json['cursus_users'].map((x) => CursusUser.fromJson(x))),
       projectsUsers: List<ProjectUser>.from(
@@ -101,23 +115,73 @@ class User42 {
   }
 }
 
+class ImageProfile {
+  String link;
+  ImageVersions versions;
+
+  ImageProfile({
+    required this.link,
+    required this.versions,
+  });
+
+  factory ImageProfile.fromJson(Map<String, dynamic> json) {
+    return ImageProfile(
+      link: json['link'],
+      versions: ImageVersions.fromJson(json['versions']),
+    );
+  }
+}
+
+class ImageVersions {
+  String large;
+  String medium;
+  String small;
+  String micro;
+
+  ImageVersions({
+    required this.large,
+    required this.medium,
+    required this.small,
+    required this.micro,
+  });
+
+  factory ImageVersions.fromJson(Map<String, dynamic> json) {
+    return ImageVersions(
+      large: json['large'],
+      medium: json['medium'],
+      small: json['small'],
+      micro: json['micro'],
+    );
+  }
+}
+
 class CursusUser {
-  String grade;
+  String? grade;
   double level;
   List<Skill> skills;
+  DateTime? blackholedAt;
+  int id;
   DateTime beginAt;
-  DateTime endAt;
+  DateTime? endAt;
   int cursusId;
   bool hasCoalition;
+  DateTime createdAt;
+  DateTime updatedAt;
+  Cursus cursus;
 
   CursusUser({
-    required this.grade,
+    this.grade,
     required this.level,
     required this.skills,
+    this.blackholedAt,
+    required this.id,
     required this.beginAt,
-    required this.endAt,
+    this.endAt,
     required this.cursusId,
     required this.hasCoalition,
+    required this.createdAt,
+    required this.updatedAt,
+    required this.cursus,
   });
 
   factory CursusUser.fromJson(Map<String, dynamic> json) {
@@ -125,10 +189,17 @@ class CursusUser {
       grade: json['grade'],
       level: json['level'].toDouble(),
       skills: List<Skill>.from(json['skills'].map((x) => Skill.fromJson(x))),
+      blackholedAt: json['blackholed_at'] != null
+          ? DateTime.parse(json['blackholed_at'])
+          : null,
+      id: json['id'],
       beginAt: DateTime.parse(json['begin_at']),
-      endAt: DateTime.parse(json['end_at']),
+      endAt: json['end_at'] != null ? DateTime.parse(json['end_at']) : null,
       cursusId: json['cursus_id'],
       hasCoalition: json['has_coalition'],
+      createdAt: DateTime.parse(json['created_at']),
+      updatedAt: DateTime.parse(json['updated_at']),
+      cursus: Cursus.fromJson(json['cursus']),
     );
   }
 }
@@ -153,34 +224,81 @@ class Skill {
   }
 }
 
+class Cursus {
+  int id;
+  DateTime createdAt;
+  String name;
+  String slug;
+  String kind;
+
+  Cursus({
+    required this.id,
+    required this.createdAt,
+    required this.name,
+    required this.slug,
+    required this.kind,
+  });
+
+  factory Cursus.fromJson(Map<String, dynamic> json) {
+    return Cursus(
+      id: json['id'],
+      createdAt: DateTime.parse(json['created_at']),
+      name: json['name'],
+      slug: json['slug'],
+      kind: json['kind'],
+    );
+  }
+}
+
 class ProjectUser {
   int id;
   int occurrence;
-  int finalMark;
+  int? finalMark;
   String status;
-  bool validated;
+  bool? validated;
   int currentTeamId;
   Project project;
+  List<int> cursusIds;
+  DateTime? markedAt;
+  bool marked;
+  DateTime? retriableAt;
+  DateTime createdAt;
+  DateTime updatedAt;
 
   ProjectUser({
     required this.id,
     required this.occurrence,
-    required this.finalMark,
+    this.finalMark,
     required this.status,
-    required this.validated,
+    this.validated,
     required this.currentTeamId,
     required this.project,
+    required this.cursusIds,
+    this.markedAt,
+    required this.marked,
+    this.retriableAt,
+    required this.createdAt,
+    required this.updatedAt,
   });
 
   factory ProjectUser.fromJson(Map<String, dynamic> json) {
     return ProjectUser(
       id: json['id'],
       occurrence: json['occurrence'],
-      finalMark: json['final_mark'] ?? 0,
+      finalMark: json['final_mark'],
       status: json['status'],
-      validated: json['validated?'] ?? false,
+      validated: json['validated?'],
       currentTeamId: json['current_team_id'],
       project: Project.fromJson(json['project']),
+      cursusIds: List<int>.from(json['cursus_ids'].map((x) => x)),
+      markedAt:
+          json['marked_at'] != null ? DateTime.parse(json['marked_at']) : null,
+      marked: json['marked'],
+      retriableAt: json['retriable_at'] != null
+          ? DateTime.parse(json['retriable_at'])
+          : null,
+      createdAt: DateTime.parse(json['created_at']),
+      updatedAt: DateTime.parse(json['updated_at']),
     );
   }
 }
@@ -189,11 +307,13 @@ class Project {
   int id;
   String name;
   String slug;
+  int? parentId;
 
   Project({
     required this.id,
     required this.name,
     required this.slug,
+    this.parentId,
   });
 
   factory Project.fromJson(Map<String, dynamic> json) {
@@ -201,6 +321,7 @@ class Project {
       id: json['id'],
       name: json['name'],
       slug: json['slug'],
+      parentId: json['parent_id'],
     );
   }
 }
@@ -239,7 +360,8 @@ class Achievement {
   String kind;
   bool visible;
   String image;
-  int nbrOfSuccess;
+  int? nbrOfSuccess;
+  String usersUrl;
 
   Achievement({
     required this.id,
@@ -249,7 +371,8 @@ class Achievement {
     required this.kind,
     required this.visible,
     required this.image,
-    required this.nbrOfSuccess,
+    this.nbrOfSuccess,
+    required this.usersUrl,
   });
 
   factory Achievement.fromJson(Map<String, dynamic> json) {
@@ -261,7 +384,8 @@ class Achievement {
       kind: json['kind'],
       visible: json['visible'],
       image: json['image'],
-      nbrOfSuccess: json['nbr_of_success'] ?? 0,
+      nbrOfSuccess: json['nbr_of_success'],
+      usersUrl: json['users_url'],
     );
   }
 }
@@ -316,6 +440,7 @@ class Campus {
   int id;
   String name;
   String timeZone;
+  int languageId;
   String country;
   String address;
   String zip;
@@ -323,11 +448,14 @@ class Campus {
   String website;
   bool active;
   bool public;
+  String emailExtension;
+  bool defaultHiddenPhone;
 
   Campus({
     required this.id,
     required this.name,
     required this.timeZone,
+    required this.languageId,
     required this.country,
     required this.address,
     required this.zip,
@@ -335,6 +463,8 @@ class Campus {
     required this.website,
     required this.active,
     required this.public,
+    required this.emailExtension,
+    required this.defaultHiddenPhone,
   });
 
   factory Campus.fromJson(Map<String, dynamic> json) {
@@ -342,6 +472,7 @@ class Campus {
       id: json['id'],
       name: json['name'],
       timeZone: json['time_zone'],
+      languageId: json['language']['id'],
       country: json['country'],
       address: json['address'],
       zip: json['zip'],
@@ -349,6 +480,8 @@ class Campus {
       website: json['website'],
       active: json['active'],
       public: json['public'],
+      emailExtension: json['email_extension'],
+      defaultHiddenPhone: json['default_hidden_phone'],
     );
   }
 }
@@ -383,10 +516,53 @@ class CampusUser {
 }
 //
 // void main() {
-//   String jsonString = '...'; // your JSON string here
+//   String jsonString = '''{
+//     "id": 94576,
+//     "email": "bducrocq@student.42lyon.fr",
+//     "login": "bducrocq",
+//     "first_name": "Benjamin",
+//     "last_name": "Ducrocq",
+//     "usual_full_name": "Benjamin Ducrocq",
+//     "usual_first_name": null,
+//     "url": "https://api.intra.42.fr/v2/users/bducrocq",
+//     "phone": "hidden",
+//     "displayname": "Benjamin Ducrocq",
+//     "staff?": false,
+//     "correction_point": 5,
+//     "pool_month": "august",
+//     "pool_year": 2021,
+//     "location": "z3r6p6",
+//     "wallet": 780,
+//     "anonymize_date": "2027-07-24T00:00:00.000+02:00",
+//     "data_erasure_date": "2027-07-24T00:00:00.000+02:00",
+//     "created_at": "2021-07-29T12:10:13.970Z",
+//     "updated_at": "2024-07-24T11:01:21.805Z",
+//     "alumnized_at": null,
+//     "alumni?": false,
+//     "active?": true,
+//     "groups": [],
+//     "image": {
+//         "link": "https://cdn.intra.42.fr/users/20396754573b1890871a5e32487140a6/bducrocq.jpg",
+//         "versions": {
+//             "large": "https://cdn.intra.42.fr/users/2ec0283d024382785590565152f76b69/large_bducrocq.jpg",
+//             "medium": "https://cdn.intra.42.fr/users/f5dc433e0c6e1fcda53775da767f7848/medium_bducrocq.jpg",
+//             "small": "https://cdn.intra.42.fr/users/c218c3e8552d09f6303afce6490c4a98/small_bducrocq.jpg",
+//             "micro": "https://cdn.intra.42.fr/users/76402209cde33ffb9dce239e657d5690/micro_bducrocq.jpg"
+//         }
+//     },
+//     "cursus_users": [],
+//     "projects_users": [],
+//     "languages_users": [],
+//     "achievements": [],
+//     "titles": [],
+//     "titles_users": [],
+//     "campus": [],
+//     "campus_users": []
+//   }''';
+//
 //   Map<String, dynamic> userMap = jsonDecode(jsonString);
 //   User user = User.fromJson(userMap);
 //
 //   // Now you can use the 'user' object in your Flutter app
-//   print(user.firstName);
+//   print(user.image.link);  // prints: https://cdn.intra.42.fr/users/20396754573b1890871a5e32487140a6/bducrocq.jpg
 // }
