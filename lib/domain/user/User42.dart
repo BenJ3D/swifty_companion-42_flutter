@@ -13,7 +13,7 @@ class User42 {
   bool isStaff;
   int correctionPoint;
   String poolMonth;
-  int poolYear;
+  String poolYear;
   String location;
   int wallet;
   DateTime anonymizeDate;
@@ -73,7 +73,7 @@ class User42 {
     print('Parsing User42 from JSON');
     try {
       return User42(
-        id: json['id'] is int ? json['id'] : int.parse(json['id'].toString()),
+        id: json['id'],
         email: json['email'] ?? '',
         login: json['login'] ?? '',
         firstName: json['first_name'] ?? '',
@@ -87,9 +87,7 @@ class User42 {
             ? json['correction_point']
             : int.parse(json['correction_point'].toString()),
         poolMonth: json['pool_month'] ?? '',
-        poolYear: json['pool_year'] is int
-            ? json['pool_year']
-            : int.parse(json['pool_year'].toString()),
+        poolYear: json['pool_year'],
         location: json['location'] ?? '',
         wallet: json['wallet'] is int
             ? json['wallet']

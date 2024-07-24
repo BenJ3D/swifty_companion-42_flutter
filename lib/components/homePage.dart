@@ -33,7 +33,7 @@ class _HomePageState extends State<HomePage> {
       isStaff: false,
       correctionPoint: 0,
       poolMonth: '',
-      poolYear: 0,
+      poolYear: '',
       location: '',
       wallet: 0,
       anonymizeDate: DateTime.now(),
@@ -61,7 +61,7 @@ class _HomePageState extends State<HomePage> {
       campus: [],
       campusUsers: [],
     );
-    // fetchData();
+    fetchData();
   }
 
   void fetchData() async {
@@ -84,109 +84,165 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  void testData() {
-    setState(() {
-      userSelected.login = "BLABLA";
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
+    final orientation = MediaQuery.of(context).orientation;
+    final topPadding = MediaQuery.of(context).padding.top;
+
     return MaterialApp(
       home: DefaultTabController(
         length: 2,
+        animationDuration: Durations.short3,
         child: Scaffold(
-          body: TabBarView(
-            children: <Widget>[
-              Center(
-                child: Column(
-                  children: [
-                    AppBar(),
-                    Text(
-                      userSelected.login,
-                      style: const TextStyle(
-                          fontSize: 24, fontWeight: FontWeight.bold),
-                      textAlign: TextAlign.left,
-                    ),
-                    ClipOval(
-                      child: SizedBox(
-                        width: 300,
-                        height: 300, // Hauteur fixe
-                        child: Image.network(
-                          userSelected.image.versions.medium,
-                          fit: BoxFit.cover, // Conserve le ratio de l'image
-                          loadingBuilder: (BuildContext context, Widget child,
-                              ImageChunkEvent? loadingProgress) {
-                            if (loadingProgress == null) {
-                              return child;
-                            } else {
-                              return Image.asset(
-                                'lib/assets/placeholder.webp',
-                                fit: BoxFit.cover,
-                              );
-                            }
-                          },
-                          errorBuilder: (BuildContext context, Object exception,
-                              StackTrace? stackTrace) {
-                            return Image.asset(
-                              'lib/assets/placeholder.webp',
-                              fit: BoxFit.cover,
-                            );
-                          },
-                        ),
-                      ),
-                    ),
-                    ElevatedButton(
-                      onPressed: fetchData,
-                      style: ElevatedButton.styleFrom(
-                        foregroundColor: Theme.of(context).primaryColorLight,
-                        backgroundColor: Theme.of(context).primaryColor,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 50, vertical: 15),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                        elevation: 5,
-                      ),
-                      child: const Text(
-                        'GET ME',
-                        style: TextStyle(fontSize: 24),
-                      ),
-                    ),
-                  ],
-                ),
+          body: Container(
+            decoration: BoxDecoration(
+              gradient: RadialGradient(
+                center: Alignment.topLeft,
+                colors: [Colors.blueGrey.shade900, Colors.black],
+                radius: 4,
               ),
-              Center(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    ElevatedButton(
-                      onPressed: fetchData,
-                      style: ElevatedButton.styleFrom(
-                        foregroundColor: Theme.of(context).primaryColorLight,
-                        backgroundColor: Theme.of(context).primaryColor,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 50, vertical: 15),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
+            ),
+            child: Padding(
+              padding: EdgeInsets.only(
+                  top:
+                      orientation == Orientation.portrait ? topPadding + 0 : 0),
+              child: TabBarView(
+                children: <Widget>[
+                  Center(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.blue.withOpacity(0.3),
+                                spreadRadius: 20,
+                                blurRadius: 40,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: ClipOval(
+                            child: SizedBox(
+                              width: 300,
+                              height: 300, // Hauteur fixe
+                              child: Image.network(
+                                userSelected.image.versions.medium,
+                                fit: BoxFit
+                                    .cover, // Conserve le ratio de l'image
+                                loadingBuilder: (BuildContext context,
+                                    Widget child,
+                                    ImageChunkEvent? loadingProgress) {
+                                  if (loadingProgress == null) {
+                                    return child;
+                                  } else {
+                                    return Image.asset(
+                                      'lib/assets/placeholder.webp',
+                                      fit: BoxFit.cover,
+                                    );
+                                  }
+                                },
+                                errorBuilder: (BuildContext context,
+                                    Object exception, StackTrace? stackTrace) {
+                                  return Image.asset(
+                                    'lib/assets/placeholder.webp',
+                                    fit: BoxFit.cover,
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
                         ),
-                        elevation: 5,
-                      ),
-                      child: const Text(
-                        'TEST FETCH',
-                        style: TextStyle(fontSize: 24),
-                      ),
+                        Text(
+                          userSelected.login,
+                          style: const TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white),
+                          textAlign: TextAlign.left,
+                        ),
+                        Text(
+                          userSelected.email,
+                          style: const TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white),
+                          textAlign: TextAlign.left,
+                        ),
+                        Text(
+                          userSelected.usualFirstName ?? '',
+                          style: const TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white),
+                          textAlign: TextAlign.left,
+                        ),
+                        Text(
+                          "Year: ${userSelected.poolYear}",
+                          style: const TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white),
+                          textAlign: TextAlign.left,
+                        ),
+                        Text(
+                          userSelected.cursusUsers.length > 1
+                              ? "Level: ${userSelected.cursusUsers[1].level}"
+                              : "Level information not available",
+                          style: const TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white),
+                          textAlign: TextAlign.left,
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                  Center(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ElevatedButton(
+                          onPressed: fetchData,
+                          style: ElevatedButton.styleFrom(
+                            foregroundColor:
+                                Theme.of(context).primaryColorLight,
+                            backgroundColor: Theme.of(context).primaryColor,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 50, vertical: 15),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                            elevation: 5,
+                          ),
+                          child: const Text(
+                            'TEST FETCH',
+                            style: TextStyle(fontSize: 24),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
-          bottomNavigationBar: const TabBar(
-            tabs: [
-              Tab(text: 'Profile'),
-              Tab(text: 'Cursus'),
-            ],
+          bottomNavigationBar: Container(
+            decoration: const BoxDecoration(
+              color: Color.fromARGB(240, 0, 0, 0),
+            ),
+            child: const TabBar(
+              labelStyle: TextStyle(
+                color: Colors.white70,
+                fontSize: 20,
+              ),
+              tabs: [
+                Tab(text: 'Profile'),
+                Tab(text: 'Cursus'),
+              ],
+            ),
           ),
         ),
       ),
