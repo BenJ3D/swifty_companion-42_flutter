@@ -143,178 +143,220 @@ class _HomePageState extends State<HomePage> {
     return MaterialApp(
       home: DefaultTabController(
         length: 2,
-        child: Scaffold(
-          body: Column(
-            children: [
-              TypeAheadField<UserSimplified>(
-                suggestionsCallback: (pattern) async {
-                  return await getSuggestions(pattern);
-                },
-                itemBuilder: (context, UserSimplified suggestion) {
-                  return ListTile(
-                    title: Text(suggestion.login),
-                    subtitle:
-                        Text('${suggestion.firstName} ${suggestion.lastName}'),
-                  );
-                },
-                onSelected: (UserSimplified suggestion) {
-                  fetchDataUser(suggestion.login);
-                },
-              ),
-              Expanded(
-                child: Container(
-                  decoration: BoxDecoration(
-                    gradient: RadialGradient(
-                      center: Alignment.topLeft,
-                      colors: [Colors.blueGrey.shade900, Colors.black],
-                      radius: 4,
-                    ),
-                  ),
-                  child: Padding(
-                    padding: EdgeInsets.only(
-                        top: orientation == Orientation.portrait
-                            ? topPadding + 0
-                            : 0),
-                    child: TabBarView(
-                      children: <Widget>[
-                        Center(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.blue.withOpacity(0.3),
-                                      spreadRadius: 20,
-                                      blurRadius: 40,
-                                      offset: const Offset(0, 4),
-                                    ),
-                                  ],
-                                ),
-                                child: ClipOval(
-                                  child: SizedBox(
-                                    width: 300,
-                                    height: 300,
-                                    child: Image.network(
-                                      userSelected.image.versions.medium,
-                                      fit: BoxFit.cover,
-                                      loadingBuilder: (BuildContext context,
-                                          Widget child,
-                                          ImageChunkEvent? loadingProgress) {
-                                        if (loadingProgress == null) {
-                                          return child;
-                                        } else {
-                                          return Image.asset(
-                                            'lib/assets/placeholder.webp',
-                                            fit: BoxFit.cover,
-                                          );
-                                        }
-                                      },
-                                      errorBuilder: (BuildContext context,
-                                          Object exception,
-                                          StackTrace? stackTrace) {
+        child: SafeArea(
+          child: Scaffold(
+            body: Column(
+              children: [
+                TypeAheadField<UserSimplified>(
+                  suggestionsCallback: (pattern) async {
+                    return await getSuggestions(pattern);
+                  },
+                  itemBuilder: (context, UserSimplified suggestion) {
+                    return Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        children: [
+                          ClipOval(
+                              child: SizedBox(
+                                  width: 70,
+                                  height: 70,
+                                  child: Image.network(
+                                    fit: BoxFit.cover,
+                                    suggestion.image.versions.small,
+                                    loadingBuilder: (BuildContext context,
+                                        Widget child,
+                                        ImageChunkEvent? loadingProgress) {
+                                      if (loadingProgress == null) {
+                                        return child;
+                                      } else {
                                         return Image.asset(
                                           'lib/assets/placeholder.webp',
                                           fit: BoxFit.cover,
                                         );
-                                      },
+                                      }
+                                    },
+                                    errorBuilder: (BuildContext context,
+                                        Object exception,
+                                        StackTrace? stackTrace) {
+                                      return Image.asset(
+                                        'lib/assets/placeholder.webp',
+                                        fit: BoxFit.cover,
+                                      );
+                                    },
+                                  ))),
+                          Expanded(
+                            child: ListTile(
+                              title: Text(suggestion.login),
+                              subtitle: Text(
+                                  '${suggestion.firstName} ${suggestion.lastName}'),
+                            ),
+                          ),
+                          // Text(suggestion.login),
+                          // Text(suggestion.firstName),
+                          // Text(suggestion.lastName),
+                        ],
+                      ),
+                    );
+                  },
+                  onSelected: (UserSimplified suggestion) {
+                    fetchDataUser(suggestion.login);
+                  },
+                ),
+                Expanded(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: RadialGradient(
+                        center: Alignment.topLeft,
+                        colors: [Colors.blueGrey.shade900, Colors.black],
+                        radius: 4,
+                      ),
+                    ),
+                    child: Padding(
+                      padding: EdgeInsets.only(
+                          top: orientation == Orientation.portrait
+                              ? topPadding + 0
+                              : 0),
+                      child: TabBarView(
+                        children: <Widget>[
+                          Center(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.blue.withOpacity(0.3),
+                                        spreadRadius: 20,
+                                        blurRadius: 40,
+                                        offset: const Offset(0, 4),
+                                      ),
+                                    ],
+                                  ),
+                                  child: ClipOval(
+                                    child: SizedBox(
+                                      width: 300,
+                                      height: 300,
+                                      child: Image.network(
+                                        userSelected.image.versions.medium,
+                                        fit: BoxFit.cover,
+                                        loadingBuilder: (BuildContext context,
+                                            Widget child,
+                                            ImageChunkEvent? loadingProgress) {
+                                          if (loadingProgress == null) {
+                                            return child;
+                                          } else {
+                                            return Image.asset(
+                                              'lib/assets/placeholder.webp',
+                                              fit: BoxFit.cover,
+                                            );
+                                          }
+                                        },
+                                        errorBuilder: (BuildContext context,
+                                            Object exception,
+                                            StackTrace? stackTrace) {
+                                          return Image.asset(
+                                            'lib/assets/placeholder.webp',
+                                            fit: BoxFit.cover,
+                                          );
+                                        },
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                              Text(
-                                userSelected.login,
-                                style: const TextStyle(
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white),
-                                textAlign: TextAlign.left,
-                              ),
-                              Text(
-                                userSelected.email,
-                                style: const TextStyle(
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white),
-                                textAlign: TextAlign.left,
-                              ),
-                              Text(
-                                userSelected.firstName ?? '',
-                                style: const TextStyle(
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white),
-                                textAlign: TextAlign.left,
-                              ),
-                              Text(
-                                "Year: ${userSelected.poolYear}",
-                                style: const TextStyle(
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white),
-                                textAlign: TextAlign.left,
-                              ),
-                              Text(
-                                userSelected.cursusUsers.isNotEmpty
-                                    ? "Level: ${userSelected.cursusUsers[0].level}"
-                                    : "Level information not available",
-                                style: const TextStyle(
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white),
-                                textAlign: TextAlign.left,
-                              ),
-                            ],
+                                Text(
+                                  userSelected.login,
+                                  style: const TextStyle(
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white),
+                                  textAlign: TextAlign.left,
+                                ),
+                                Text(
+                                  userSelected.email,
+                                  style: const TextStyle(
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white),
+                                  textAlign: TextAlign.left,
+                                ),
+                                Text(
+                                  userSelected.firstName ?? '',
+                                  style: const TextStyle(
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white),
+                                  textAlign: TextAlign.left,
+                                ),
+                                Text(
+                                  "Year: ${userSelected.poolYear}",
+                                  style: const TextStyle(
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white),
+                                  textAlign: TextAlign.left,
+                                ),
+                                Text(
+                                  userSelected.cursusUsers.isNotEmpty
+                                      ? "Level: ${userSelected.cursusUsers[0].level}"
+                                      : "Level information not available",
+                                  style: const TextStyle(
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white),
+                                  textAlign: TextAlign.left,
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                        Center(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              ElevatedButton(
-                                onPressed: () => fetchDataUser(login),
-                                style: ElevatedButton.styleFrom(
-                                  foregroundColor:
-                                      Theme.of(context).primaryColorLight,
-                                  backgroundColor:
-                                      Theme.of(context).primaryColor,
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 50, vertical: 15),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(30),
+                          Center(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                ElevatedButton(
+                                  onPressed: () => fetchDataUser(login),
+                                  style: ElevatedButton.styleFrom(
+                                    foregroundColor:
+                                        Theme.of(context).primaryColorLight,
+                                    backgroundColor:
+                                        Theme.of(context).primaryColor,
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 50, vertical: 15),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(30),
+                                    ),
+                                    elevation: 5,
                                   ),
-                                  elevation: 5,
+                                  child: const Text(
+                                    'TEST FETCH',
+                                    style: TextStyle(fontSize: 24),
+                                  ),
                                 ),
-                                child: const Text(
-                                  'TEST FETCH',
-                                  style: TextStyle(fontSize: 24),
-                                ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
-          ),
-          bottomNavigationBar: Container(
-            decoration: const BoxDecoration(
-              color: Color.fromARGB(240, 0, 0, 0),
-            ),
-            child: const TabBar(
-              labelStyle: TextStyle(
-                color: Colors.white70,
-                fontSize: 20,
-              ),
-              tabs: [
-                Tab(text: 'Profile'),
-                Tab(text: 'Cursus'),
               ],
+            ),
+            bottomNavigationBar: Container(
+              decoration: const BoxDecoration(
+                color: Color.fromARGB(240, 0, 0, 0),
+              ),
+              child: const TabBar(
+                labelStyle: TextStyle(
+                  color: Colors.white70,
+                  fontSize: 20,
+                ),
+                tabs: [
+                  Tab(text: 'Profile'),
+                  Tab(text: 'Cursus'),
+                ],
+              ),
             ),
           ),
         ),
