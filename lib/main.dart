@@ -4,6 +4,14 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:swifty_companion/services/TokenInterceptor.dart';
 import 'services/AuthService.dart';
 
+//TODO: clear la search bar quand select user ou UnFocus
+//TODO: Verfier le refresh Token
+//TODO: gerer les cursus
+//TODO: mise en page de toute les info legit sujet
+//TODO: gerer le token en ouverture d'app pour ne pas reloggin a chaque fois
+//TODO: mettre des loaders ?
+//TODO: gerer les erreur connexion
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");

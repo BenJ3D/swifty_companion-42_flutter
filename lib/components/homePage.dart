@@ -105,6 +105,7 @@ class _HomePageState extends State<HomePage> {
       return [];
     }
     try {
+      print('ENTER GET SUGGESTIONS : pattern = **** $pattern ****');
       Response response = await dio.get(
         'https://api.intra.42.fr/v2/users',
         queryParameters: {
@@ -226,14 +227,12 @@ class _HomePageState extends State<HomePage> {
                       Text('${suggestion.firstName} ${suggestion.lastName}'),
                 ),
               ),
-              // Text(suggestion.login),
-              // Text(suggestion.firstName),
-              // Text(suggestion.lastName),
             ],
           ),
         );
       },
       onSelected: (UserSuggestion suggestion) {
+        print("PK????******");
         fetchDataUser(suggestion.login);
       },
     );

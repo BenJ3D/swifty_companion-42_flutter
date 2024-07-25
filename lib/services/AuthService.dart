@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:swifty_companion/main.dart';
 import 'package:swifty_companion/services/TokenService.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:app_links/app_links.dart';
@@ -95,9 +96,32 @@ class AuthService {
     }
   }
 
+  Future<bool> handleRefreshToken() async {
+    try {
+      final token = await _refreshToken();
+      // Utilisez le token comme vous le souhaitez
+      print('Token obtenu: ${token.accessToken}');
+      await tokenService.saveToken(token.accessToken);
+      await tokenService.saveRefreshToken(token.refreshToken);
+    } catch (e) {
+      print('Erreur lors de l\'obtention du token: $e');
+      return false;
+    }
+    return false;
+  }
+
   void _loginSuccess(BuildContext context) {
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(builder: (context) => const HomePage()),
+    );
+  }
+
+  void loginFail(BuildContext context) {
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+          builder: (context) => const MyHomePage(
+                title: 'Login Page',
+              )),
     );
   }
 
@@ -110,6 +134,26 @@ class AuthService {
         'client_id': dotenv.env['CLIENT_UID'],
         'client_secret': dotenv.env['CLIENT_SECRET'],
         'code': code,
+        'redirect_uri': dotenv.env['REDIRECT_URI'],
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return AuthToken.fromJson(json.decode(response.body));
+    } else {
+      throw Exception('Échec de l\'obtention du token: ${response.body}');
+    }
+  }
+
+  Future<AuthToken> _refreshToken() async {
+    final url = Uri.parse('https://api.intra.42.fr/oauth/token');
+    final response = await http.post(
+      url,
+      body: {
+        'grant_type': 'refresh_token',
+        'client_id': dotenv.env['CLIENT_UID'],
+        'client_secret': dotenv.env['CLIENT_SECRET'],
+        'refresh_token': tokenService.getRefreshToken() ?? '',
         'redirect_uri': dotenv.env['REDIRECT_URI'],
       },
     );
