@@ -4,10 +4,11 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:swifty_companion/domain/user/UserSearchBar.dart';
-import 'package:swifty_companion/domain/user/UserSimplified.dart';
+import 'package:swifty_companion/domain/user/UserSuggestion.dart';
 
 import '../domain/user/User42.dart';
 import '../services/TokenInterceptor.dart';
+import 'mainProfile.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -18,7 +19,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   late User42 userSelected;
-  late List<UserSimplified> usersSuggestion;
+  late List<UserSuggestion> usersSuggestion;
   late UserSearchBar usersSuggestion2;
   late String login = 'login';
   final dio = Dio();
@@ -99,19 +100,7 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  void fetchSuggestion(String login) async {
-    try {
-      Response response = await dio.get(
-          'https://api.intra.42.fr/v2/users?range[login]=$login,${login}z&per_page=5');
-      setState(() {
-        usersSuggestion2 = UserSearchBar.fromJson(response.data);
-      });
-    } catch (e) {
-      print('Error: $e');
-    }
-  }
-
-  Future<List<UserSimplified>> getSuggestions(String pattern) async {
+  Future<List<UserSuggestion>> getSuggestions(String pattern) async {
     if (pattern.isEmpty) {
       return [];
     }
@@ -124,8 +113,8 @@ class _HomePageState extends State<HomePage> {
         },
       );
 
-      List<UserSimplified> suggestions = (response.data as List)
-          .map((userData) => UserSimplified.fromJson(userData))
+      List<UserSuggestion> suggestions = (response.data as List)
+          .map((userData) => UserSuggestion.fromJson(userData))
           .toList();
 
       return suggestions;
@@ -147,61 +136,7 @@ class _HomePageState extends State<HomePage> {
           child: Scaffold(
             body: Column(
               children: [
-                TypeAheadField<UserSimplified>(
-                  suggestionsCallback: (pattern) async {
-                    return await getSuggestions(pattern);
-                  },
-                  itemBuilder: (context, UserSimplified suggestion) {
-                    return Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        children: [
-                          ClipOval(
-                              child: SizedBox(
-                                  width: 70,
-                                  height: 70,
-                                  child: Image.network(
-                                    fit: BoxFit.cover,
-                                    suggestion.image.versions.small,
-                                    loadingBuilder: (BuildContext context,
-                                        Widget child,
-                                        ImageChunkEvent? loadingProgress) {
-                                      if (loadingProgress == null) {
-                                        return child;
-                                      } else {
-                                        return Image.asset(
-                                          'lib/assets/placeholder.webp',
-                                          fit: BoxFit.cover,
-                                        );
-                                      }
-                                    },
-                                    errorBuilder: (BuildContext context,
-                                        Object exception,
-                                        StackTrace? stackTrace) {
-                                      return Image.asset(
-                                        'lib/assets/placeholder.webp',
-                                        fit: BoxFit.cover,
-                                      );
-                                    },
-                                  ))),
-                          Expanded(
-                            child: ListTile(
-                              title: Text(suggestion.login),
-                              subtitle: Text(
-                                  '${suggestion.firstName} ${suggestion.lastName}'),
-                            ),
-                          ),
-                          // Text(suggestion.login),
-                          // Text(suggestion.firstName),
-                          // Text(suggestion.lastName),
-                        ],
-                      ),
-                    );
-                  },
-                  onSelected: (UserSimplified suggestion) {
-                    fetchDataUser(suggestion.login);
-                  },
-                ),
+                searchBarTypeAheadField(),
                 Expanded(
                   child: Container(
                     decoration: BoxDecoration(
@@ -218,124 +153,8 @@ class _HomePageState extends State<HomePage> {
                               : 0),
                       child: TabBarView(
                         children: <Widget>[
-                          Center(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Container(
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.blue.withOpacity(0.3),
-                                        spreadRadius: 20,
-                                        blurRadius: 40,
-                                        offset: const Offset(0, 4),
-                                      ),
-                                    ],
-                                  ),
-                                  child: ClipOval(
-                                    child: SizedBox(
-                                      width: 300,
-                                      height: 300,
-                                      child: Image.network(
-                                        userSelected.image.versions.medium,
-                                        fit: BoxFit.cover,
-                                        loadingBuilder: (BuildContext context,
-                                            Widget child,
-                                            ImageChunkEvent? loadingProgress) {
-                                          if (loadingProgress == null) {
-                                            return child;
-                                          } else {
-                                            return Image.asset(
-                                              'lib/assets/placeholder.webp',
-                                              fit: BoxFit.cover,
-                                            );
-                                          }
-                                        },
-                                        errorBuilder: (BuildContext context,
-                                            Object exception,
-                                            StackTrace? stackTrace) {
-                                          return Image.asset(
-                                            'lib/assets/placeholder.webp',
-                                            fit: BoxFit.cover,
-                                          );
-                                        },
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                Text(
-                                  userSelected.login,
-                                  style: const TextStyle(
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white),
-                                  textAlign: TextAlign.left,
-                                ),
-                                Text(
-                                  userSelected.email,
-                                  style: const TextStyle(
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white),
-                                  textAlign: TextAlign.left,
-                                ),
-                                Text(
-                                  userSelected.firstName ?? '',
-                                  style: const TextStyle(
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white),
-                                  textAlign: TextAlign.left,
-                                ),
-                                Text(
-                                  "Year: ${userSelected.poolYear}",
-                                  style: const TextStyle(
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white),
-                                  textAlign: TextAlign.left,
-                                ),
-                                Text(
-                                  userSelected.cursusUsers.isNotEmpty
-                                      ? "Level: ${userSelected.cursusUsers[0].level}"
-                                      : "Level information not available",
-                                  style: const TextStyle(
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white),
-                                  textAlign: TextAlign.left,
-                                ),
-                              ],
-                            ),
-                          ),
-                          Center(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                ElevatedButton(
-                                  onPressed: () => fetchDataUser(login),
-                                  style: ElevatedButton.styleFrom(
-                                    foregroundColor:
-                                        Theme.of(context).primaryColorLight,
-                                    backgroundColor:
-                                        Theme.of(context).primaryColor,
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 50, vertical: 15),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(30),
-                                    ),
-                                    elevation: 5,
-                                  ),
-                                  child: const Text(
-                                    'TEST FETCH',
-                                    style: TextStyle(fontSize: 24),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
+                          MainProfile(userSelected: userSelected),
+                          cursusView(context),
                         ],
                       ),
                     ),
@@ -360,6 +179,88 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  TypeAheadField<UserSuggestion> searchBarTypeAheadField() {
+    return TypeAheadField<UserSuggestion>(
+      suggestionsCallback: (pattern) async {
+        return await getSuggestions(pattern);
+      },
+      itemBuilder: (context, UserSuggestion suggestion) {
+        return Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Row(
+            children: [
+              ClipOval(
+                  child: SizedBox(
+                      width: 70,
+                      height: 70,
+                      child: Image.network(
+                        fit: BoxFit.cover,
+                        suggestion.image.versions.small,
+                        loadingBuilder: (BuildContext context, Widget child,
+                            ImageChunkEvent? loadingProgress) {
+                          if (loadingProgress == null) {
+                            return child;
+                          } else {
+                            return Image.asset(
+                              'lib/assets/placeholder.webp',
+                              fit: BoxFit.cover,
+                            );
+                          }
+                        },
+                        errorBuilder: (BuildContext context, Object exception,
+                            StackTrace? stackTrace) {
+                          return Image.asset(
+                            'lib/assets/placeholder.webp',
+                            fit: BoxFit.cover,
+                          );
+                        },
+                      ))),
+              Expanded(
+                child: ListTile(
+                  title: Text(suggestion.login),
+                  subtitle:
+                      Text('${suggestion.firstName} ${suggestion.lastName}'),
+                ),
+              ),
+              // Text(suggestion.login),
+              // Text(suggestion.firstName),
+              // Text(suggestion.lastName),
+            ],
+          ),
+        );
+      },
+      onSelected: (UserSuggestion suggestion) {
+        fetchDataUser(suggestion.login);
+      },
+    );
+  }
+
+  Center cursusView(BuildContext context) {
+    return Center(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          ElevatedButton(
+            onPressed: () => fetchDataUser(login),
+            style: ElevatedButton.styleFrom(
+              foregroundColor: Theme.of(context).primaryColorLight,
+              backgroundColor: Theme.of(context).primaryColor,
+              padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30),
+              ),
+              elevation: 5,
+            ),
+            child: const Text(
+              'TEST FETCH',
+              style: TextStyle(fontSize: 24),
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -1,21 +1,21 @@
 import 'dart:convert';
 
-class UserSimplified {
+class UserSuggestion {
   String login;
   String firstName;
   String lastName;
   ImageUserSimplified image;
 
-  UserSimplified({
+  UserSuggestion({
     required this.login,
     required this.firstName,
     required this.lastName,
     required this.image,
   });
 
-  factory UserSimplified.fromJson(Map<String, dynamic> json) {
+  factory UserSuggestion.fromJson(Map<String, dynamic> json) {
     try {
-      return UserSimplified(
+      return UserSuggestion(
         login: json['login'] ?? '',
         firstName: json['first_name'] ?? '',
         lastName: json['last_name'] ?? '',
@@ -70,9 +70,9 @@ class ImageVersionsUserSimplified {
   }
 }
 
-List<UserSimplified> parseUsers(String responseBody) {
+List<UserSuggestion> parseUsers(String responseBody) {
   final parsed = json.decode(responseBody).cast<Map<String, dynamic>>();
   return parsed
-      .map<UserSimplified>((json) => UserSimplified.fromJson(json))
+      .map<UserSuggestion>((json) => UserSuggestion.fromJson(json))
       .toList();
 }
