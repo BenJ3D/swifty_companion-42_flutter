@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'package:swifty_companion/domain/user/UserSearchBar.dart';
+import 'package:swifty_companion/domain/user/UserSimplified.dart';
 
 import '../domain/user/User42.dart';
 import '../services/TokenInterceptor.dart';
@@ -16,6 +18,8 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   late User42 userSelected;
+  late List<UserSimplified> usersSuggestion;
+  late UserSearchBar usersSuggestion2;
   late String login = 'login';
   final dio = Dio();
 
@@ -79,8 +83,7 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  void fetchDataUser() async {
-    login = 'tgriffit'; // TODO:
+  void fetchDataUser(String login) async {
     try {
       print('TEST FETCH USER');
 
@@ -96,6 +99,42 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  void fetchSuggestion(String login) async {
+    try {
+      Response response = await dio.get(
+          'https://api.intra.42.fr/v2/users?range[login]=$login,${login}z&per_page=5');
+      setState(() {
+        usersSuggestion2 = UserSearchBar.fromJson(response.data);
+      });
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
+
+  Future<List<UserSimplified>> getSuggestions(String pattern) async {
+    if (pattern.isEmpty) {
+      return [];
+    }
+    try {
+      Response response = await dio.get(
+        'https://api.intra.42.fr/v2/users',
+        queryParameters: {
+          'range[login]': '$pattern,${pattern}z',
+          'per_page': '5'
+        },
+      );
+
+      List<UserSimplified> suggestions = (response.data as List)
+          .map((userData) => UserSimplified.fromJson(userData))
+          .toList();
+
+      return suggestions;
+    } catch (e) {
+      print('Error fetching suggestions: $e');
+      return [];
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final orientation = MediaQuery.of(context).orientation;
@@ -104,142 +143,164 @@ class _HomePageState extends State<HomePage> {
     return MaterialApp(
       home: DefaultTabController(
         length: 2,
-        animationDuration: Durations.short3,
         child: Scaffold(
-          body: Container(
-            decoration: BoxDecoration(
-              gradient: RadialGradient(
-                center: Alignment.topLeft,
-                colors: [Colors.blueGrey.shade900, Colors.black],
-                radius: 4,
+          body: Column(
+            children: [
+              TypeAheadField<UserSimplified>(
+                suggestionsCallback: (pattern) async {
+                  return await getSuggestions(pattern);
+                },
+                itemBuilder: (context, UserSimplified suggestion) {
+                  return ListTile(
+                    title: Text(suggestion.login),
+                    subtitle:
+                        Text('${suggestion.firstName} ${suggestion.lastName}'),
+                  );
+                },
+                onSelected: (UserSimplified suggestion) {
+                  fetchDataUser(suggestion.login);
+                },
               ),
-            ),
-            child: Padding(
-              padding: EdgeInsets.only(
-                  top:
-                      orientation == Orientation.portrait ? topPadding + 0 : 0),
-              child: TabBarView(
-                children: <Widget>[
-                  Center(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.blue.withOpacity(0.3),
-                                spreadRadius: 20,
-                                blurRadius: 40,
-                                offset: const Offset(0, 4),
+              Expanded(
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: RadialGradient(
+                      center: Alignment.topLeft,
+                      colors: [Colors.blueGrey.shade900, Colors.black],
+                      radius: 4,
+                    ),
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.only(
+                        top: orientation == Orientation.portrait
+                            ? topPadding + 0
+                            : 0),
+                    child: TabBarView(
+                      children: <Widget>[
+                        Center(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.blue.withOpacity(0.3),
+                                      spreadRadius: 20,
+                                      blurRadius: 40,
+                                      offset: const Offset(0, 4),
+                                    ),
+                                  ],
+                                ),
+                                child: ClipOval(
+                                  child: SizedBox(
+                                    width: 300,
+                                    height: 300,
+                                    child: Image.network(
+                                      userSelected.image.versions.medium,
+                                      fit: BoxFit.cover,
+                                      loadingBuilder: (BuildContext context,
+                                          Widget child,
+                                          ImageChunkEvent? loadingProgress) {
+                                        if (loadingProgress == null) {
+                                          return child;
+                                        } else {
+                                          return Image.asset(
+                                            'lib/assets/placeholder.webp',
+                                            fit: BoxFit.cover,
+                                          );
+                                        }
+                                      },
+                                      errorBuilder: (BuildContext context,
+                                          Object exception,
+                                          StackTrace? stackTrace) {
+                                        return Image.asset(
+                                          'lib/assets/placeholder.webp',
+                                          fit: BoxFit.cover,
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Text(
+                                userSelected.login,
+                                style: const TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white),
+                                textAlign: TextAlign.left,
+                              ),
+                              Text(
+                                userSelected.email,
+                                style: const TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white),
+                                textAlign: TextAlign.left,
+                              ),
+                              Text(
+                                userSelected.firstName ?? '',
+                                style: const TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white),
+                                textAlign: TextAlign.left,
+                              ),
+                              Text(
+                                "Year: ${userSelected.poolYear}",
+                                style: const TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white),
+                                textAlign: TextAlign.left,
+                              ),
+                              Text(
+                                userSelected.cursusUsers.isNotEmpty
+                                    ? "Level: ${userSelected.cursusUsers[0].level}"
+                                    : "Level information not available",
+                                style: const TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white),
+                                textAlign: TextAlign.left,
                               ),
                             ],
                           ),
-                          child: ClipOval(
-                            child: SizedBox(
-                              width: 300,
-                              height: 300, // Hauteur fixe
-                              child: Image.network(
-                                userSelected.image.versions.medium,
-                                fit: BoxFit
-                                    .cover, // Conserve le ratio de l'image
-                                loadingBuilder: (BuildContext context,
-                                    Widget child,
-                                    ImageChunkEvent? loadingProgress) {
-                                  if (loadingProgress == null) {
-                                    return child;
-                                  } else {
-                                    return Image.asset(
-                                      'lib/assets/placeholder.webp',
-                                      fit: BoxFit.cover,
-                                    );
-                                  }
-                                },
-                                errorBuilder: (BuildContext context,
-                                    Object exception, StackTrace? stackTrace) {
-                                  return Image.asset(
-                                    'lib/assets/placeholder.webp',
-                                    fit: BoxFit.cover,
-                                  );
-                                },
+                        ),
+                        Center(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              ElevatedButton(
+                                onPressed: () => fetchDataUser(login),
+                                style: ElevatedButton.styleFrom(
+                                  foregroundColor:
+                                      Theme.of(context).primaryColorLight,
+                                  backgroundColor:
+                                      Theme.of(context).primaryColor,
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 50, vertical: 15),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(30),
+                                  ),
+                                  elevation: 5,
+                                ),
+                                child: const Text(
+                                  'TEST FETCH',
+                                  style: TextStyle(fontSize: 24),
+                                ),
                               ),
-                            ),
-                          ),
-                        ),
-                        Text(
-                          userSelected.login,
-                          style: const TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white),
-                          textAlign: TextAlign.left,
-                        ),
-                        Text(
-                          userSelected.email,
-                          style: const TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white),
-                          textAlign: TextAlign.left,
-                        ),
-                        Text(
-                          userSelected.usualFirstName ?? '',
-                          style: const TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white),
-                          textAlign: TextAlign.left,
-                        ),
-                        Text(
-                          "Year: ${userSelected.poolYear}",
-                          style: const TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white),
-                          textAlign: TextAlign.left,
-                        ),
-                        Text(
-                          userSelected.cursusUsers.length > 1
-                              ? "Level: ${userSelected.cursusUsers[1].level}"
-                              : "Level information not available",
-                          style: const TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white),
-                          textAlign: TextAlign.left,
-                        ),
-                      ],
-                    ),
-                  ),
-                  Center(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        ElevatedButton(
-                          onPressed: fetchDataUser,
-                          style: ElevatedButton.styleFrom(
-                            foregroundColor:
-                                Theme.of(context).primaryColorLight,
-                            backgroundColor: Theme.of(context).primaryColor,
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 50, vertical: 15),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30),
-                            ),
-                            elevation: 5,
-                          ),
-                          child: const Text(
-                            'TEST FETCH',
-                            style: TextStyle(fontSize: 24),
+                            ],
                           ),
                         ),
                       ],
                     ),
                   ),
-                ],
+                ),
               ),
-            ),
+            ],
           ),
           bottomNavigationBar: Container(
             decoration: const BoxDecoration(
@@ -260,8 +321,4 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-}
-
-void main() {
-  runApp(const HomePage());
 }

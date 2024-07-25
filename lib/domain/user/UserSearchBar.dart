@@ -1,12 +1,13 @@
-import 'User.dart';
+import 'UserSimplified.dart';
 
 class UserSearchBar {
-  final List<User> users;
+  List<UserSimplified> users;
 
   UserSearchBar({required this.users});
 
   factory UserSearchBar.fromJson(List<dynamic> json) {
-    List<User> users = json.map((e) => User.fromJson(e)).toList();
+    List<UserSimplified> users =
+        json.map((e) => UserSimplified.fromJson(e)).toList();
     return UserSearchBar(users: users);
   }
 }
