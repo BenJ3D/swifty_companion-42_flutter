@@ -83,15 +83,11 @@ class User42 {
         url: json['url'] ?? '',
         displayName: json['displayname'] ?? '',
         isStaff: json['staff?'] ?? false,
-        correctionPoint: json['correction_point'] is int
-            ? json['correction_point']
-            : int.parse(json['correction_point'].toString()),
+        correctionPoint: int.tryParse(json['correction_point'].toString()) ?? 0,
         poolMonth: json['pool_month'] ?? '',
-        poolYear: json['pool_year'],
+        poolYear: json['pool_year'] ?? '',
         location: json['location'] ?? '',
-        wallet: json['wallet'] is int
-            ? json['wallet']
-            : int.parse(json['wallet'].toString()),
+        wallet: int.tryParse(json['wallet'].toString()) ?? 0,
         anonymizeDate: json['anonymize_date'] != null
             ? DateTime.parse(json['anonymize_date'])
             : DateTime.now(),
@@ -115,8 +111,9 @@ class User42 {
                 ?.map((x) => CursusUser.fromJson(x))
                 .toList() ??
             [],
-        projectsUsers: (json['projects_users'] as List<dynamic>?)
-                ?.map((x) => ProjectUser.fromJson(x))
+        projectsUsers: (json['projects_users'] as List?)
+                ?.whereType<Map<String, dynamic>>()
+                .map((x) => ProjectUser.fromJson(x))
                 .toList() ??
             [],
         languagesUsers: (json['languages_users'] as List<dynamic>?)
@@ -164,8 +161,8 @@ class ImageProfile {
 
   factory ImageProfile.fromJson(Map<String, dynamic> json) {
     return ImageProfile(
-      link: json['link'],
-      versions: ImageVersions.fromJson(json['versions']),
+      link: json['link'] ?? '',
+      versions: ImageVersions.fromJson(json['versions'] ?? {}),
     );
   }
 }
@@ -185,10 +182,10 @@ class ImageVersions {
 
   factory ImageVersions.fromJson(Map<String, dynamic> json) {
     return ImageVersions(
-      large: json['large'],
-      medium: json['medium'],
-      small: json['small'],
-      micro: json['micro'],
+      large: json['large'] ?? '',
+      medium: json['medium'] ?? '',
+      small: json['small'] ?? '',
+      micro: json['micro'] ?? '',
     );
   }
 }
@@ -225,19 +222,28 @@ class CursusUser {
   factory CursusUser.fromJson(Map<String, dynamic> json) {
     return CursusUser(
       grade: json['grade'],
-      level: json['level'].toDouble(),
-      skills: List<Skill>.from(json['skills'].map((x) => Skill.fromJson(x))),
+      level: (json['level'] as num?)?.toDouble() ?? 0.0,
+      skills: (json['skills'] as List<dynamic>?)
+              ?.map((x) => Skill.fromJson(x))
+              .toList() ??
+          [],
       blackholedAt: json['blackholed_at'] != null
           ? DateTime.parse(json['blackholed_at'])
           : null,
-      id: json['id'],
-      beginAt: DateTime.parse(json['begin_at']),
+      id: json['id'] ?? 0,
+      beginAt: json['begin_at'] != null
+          ? DateTime.parse(json['begin_at'])
+          : DateTime.now(),
       endAt: json['end_at'] != null ? DateTime.parse(json['end_at']) : null,
-      cursusId: json['cursus_id'],
-      hasCoalition: json['has_coalition'],
-      createdAt: DateTime.parse(json['created_at']),
-      updatedAt: DateTime.parse(json['updated_at']),
-      cursus: Cursus.fromJson(json['cursus']),
+      cursusId: json['cursus_id'] ?? 0,
+      hasCoalition: json['has_coalition'] ?? false,
+      createdAt: json['created_at'] != null
+          ? DateTime.parse(json['created_at'])
+          : DateTime.now(),
+      updatedAt: json['updated_at'] != null
+          ? DateTime.parse(json['updated_at'])
+          : DateTime.now(),
+      cursus: Cursus.fromJson(json['cursus'] ?? {}),
     );
   }
 }
@@ -255,9 +261,9 @@ class Skill {
 
   factory Skill.fromJson(Map<String, dynamic> json) {
     return Skill(
-      id: json['id'],
-      name: json['name'],
-      level: json['level'].toDouble(),
+      id: json['id'] ?? 0,
+      name: json['name'] ?? '',
+      level: (json['level'] as num?)?.toDouble() ?? 0.0,
     );
   }
 }
@@ -279,11 +285,13 @@ class Cursus {
 
   factory Cursus.fromJson(Map<String, dynamic> json) {
     return Cursus(
-      id: json['id'],
-      createdAt: DateTime.parse(json['created_at']),
-      name: json['name'],
-      slug: json['slug'],
-      kind: json['kind'],
+      id: json['id'] ?? 0,
+      createdAt: json['created_at'] != null
+          ? DateTime.parse(json['created_at'])
+          : DateTime.now(),
+      name: json['name'] ?? '',
+      slug: json['slug'] ?? '',
+      kind: json['kind'] ?? '',
     );
   }
 }
@@ -321,22 +329,26 @@ class ProjectUser {
 
   factory ProjectUser.fromJson(Map<String, dynamic> json) {
     return ProjectUser(
-      id: json['id'],
-      occurrence: json['occurrence'],
+      id: json['id'] ?? 0,
+      occurrence: json['occurrence'] ?? 0,
       finalMark: json['final_mark'],
-      status: json['status'],
+      status: json['status'] ?? '',
       validated: json['validated?'],
-      currentTeamId: json['current_team_id'],
-      project: Project.fromJson(json['project']),
-      cursusIds: List<int>.from(json['cursus_ids'].map((x) => x)),
+      currentTeamId: json['current_team_id'] ?? 0,
+      project: Project.fromJson(json['project'] ?? {}),
+      cursusIds: List<int>.from(json['cursus_ids'] ?? []),
       markedAt:
           json['marked_at'] != null ? DateTime.parse(json['marked_at']) : null,
-      marked: json['marked'],
+      marked: json['marked'] ?? false,
       retriableAt: json['retriable_at'] != null
           ? DateTime.parse(json['retriable_at'])
           : null,
-      createdAt: DateTime.parse(json['created_at']),
-      updatedAt: DateTime.parse(json['updated_at']),
+      createdAt: json['created_at'] != null
+          ? DateTime.parse(json['created_at'])
+          : DateTime.now(),
+      updatedAt: json['updated_at'] != null
+          ? DateTime.parse(json['updated_at'])
+          : DateTime.now(),
     );
   }
 }
@@ -356,10 +368,12 @@ class Project {
 
   factory Project.fromJson(Map<String, dynamic> json) {
     return Project(
-      id: json['id'],
-      name: json['name'],
-      slug: json['slug'],
-      parentId: json['parent_id'],
+      id: json['id'] ?? 0,
+      name: json['name'] ?? '',
+      slug: json['slug'] ?? '',
+      parentId: json['parent_id'] != null
+          ? int.tryParse(json['parent_id'].toString())
+          : null,
     );
   }
 }
@@ -381,11 +395,13 @@ class LanguageUser {
 
   factory LanguageUser.fromJson(Map<String, dynamic> json) {
     return LanguageUser(
-      id: json['id'],
-      languageId: json['language_id'],
-      userId: json['user_id'],
-      position: json['position'],
-      createdAt: DateTime.parse(json['created_at']),
+      id: json['id'] ?? 0,
+      languageId: json['language_id'] ?? 0,
+      userId: json['user_id'] ?? 0,
+      position: json['position'] ?? 0,
+      createdAt: json['created_at'] != null
+          ? DateTime.parse(json['created_at'])
+          : DateTime.now(),
     );
   }
 }
@@ -415,15 +431,15 @@ class Achievement {
 
   factory Achievement.fromJson(Map<String, dynamic> json) {
     return Achievement(
-      id: json['id'],
-      name: json['name'],
-      description: json['description'],
-      tier: json['tier'],
-      kind: json['kind'],
-      visible: json['visible'],
-      image: json['image'],
+      id: json['id'] ?? 0,
+      name: json['name'] ?? '',
+      description: json['description'] ?? '',
+      tier: json['tier'] ?? '',
+      kind: json['kind'] ?? '',
+      visible: json['visible'] ?? false,
+      image: json['image'] ?? '',
       nbrOfSuccess: json['nbr_of_success'],
-      usersUrl: json['users_url'],
+      usersUrl: json['users_url'] ?? '',
     );
   }
 }
@@ -439,8 +455,8 @@ class Title {
 
   factory Title.fromJson(Map<String, dynamic> json) {
     return Title(
-      id: json['id'],
-      name: json['name'],
+      id: json['id'] ?? 0,
+      name: json['name'] ?? '',
     );
   }
 }
@@ -464,12 +480,16 @@ class TitleUser {
 
   factory TitleUser.fromJson(Map<String, dynamic> json) {
     return TitleUser(
-      id: json['id'],
-      userId: json['user_id'],
-      titleId: json['title_id'],
-      selected: json['selected'],
-      createdAt: DateTime.parse(json['created_at']),
-      updatedAt: DateTime.parse(json['updated_at']),
+      id: json['id'] ?? 0,
+      userId: json['user_id'] ?? 0,
+      titleId: json['title_id'] ?? 0,
+      selected: json['selected'] ?? false,
+      createdAt: json['created_at'] != null
+          ? DateTime.parse(json['created_at'])
+          : DateTime.now(),
+      updatedAt: json['updated_at'] != null
+          ? DateTime.parse(json['updated_at'])
+          : DateTime.now(),
     );
   }
 }
@@ -507,19 +527,19 @@ class Campus {
 
   factory Campus.fromJson(Map<String, dynamic> json) {
     return Campus(
-      id: json['id'],
-      name: json['name'],
-      timeZone: json['time_zone'],
-      languageId: json['language']['id'],
-      country: json['country'],
-      address: json['address'],
-      zip: json['zip'],
-      city: json['city'],
-      website: json['website'],
-      active: json['active'],
-      public: json['public'],
-      emailExtension: json['email_extension'],
-      defaultHiddenPhone: json['default_hidden_phone'],
+      id: json['id'] ?? 0,
+      name: json['name'] ?? '',
+      timeZone: json['time_zone'] ?? '',
+      languageId: json['language']?['id'] ?? 0,
+      country: json['country'] ?? '',
+      address: json['address'] ?? '',
+      zip: json['zip'] ?? '',
+      city: json['city'] ?? '',
+      website: json['website'] ?? '',
+      active: json['active'] ?? false,
+      public: json['public'] ?? false,
+      emailExtension: json['email_extension'] ?? '',
+      defaultHiddenPhone: json['default_hidden_phone'] ?? false,
     );
   }
 }
@@ -543,64 +563,16 @@ class CampusUser {
 
   factory CampusUser.fromJson(Map<String, dynamic> json) {
     return CampusUser(
-      id: json['id'],
-      userId: json['user_id'],
-      campusId: json['campus_id'],
-      isPrimary: json['is_primary'],
-      createdAt: DateTime.parse(json['created_at']),
-      updatedAt: DateTime.parse(json['updated_at']),
+      id: json['id'] ?? 0,
+      userId: json['user_id'] ?? 0,
+      campusId: json['campus_id'] ?? 0,
+      isPrimary: json['is_primary'] ?? false,
+      createdAt: json['created_at'] != null
+          ? DateTime.parse(json['created_at'])
+          : DateTime.now(),
+      updatedAt: json['updated_at'] != null
+          ? DateTime.parse(json['updated_at'])
+          : DateTime.now(),
     );
   }
 }
-//
-// void main() {
-//   String jsonString = '''{
-//     "id": 94576,
-//     "email": "bducrocq@student.42lyon.fr",
-//     "login": "bducrocq",
-//     "first_name": "Benjamin",
-//     "last_name": "Ducrocq",
-//     "usual_full_name": "Benjamin Ducrocq",
-//     "usual_first_name": null,
-//     "url": "https://api.intra.42.fr/v2/users/bducrocq",
-//     "phone": "hidden",
-//     "displayname": "Benjamin Ducrocq",
-//     "staff?": false,
-//     "correction_point": 5,
-//     "pool_month": "august",
-//     "pool_year": 2021,
-//     "location": "z3r6p6",
-//     "wallet": 780,
-//     "anonymize_date": "2027-07-24T00:00:00.000+02:00",
-//     "data_erasure_date": "2027-07-24T00:00:00.000+02:00",
-//     "created_at": "2021-07-29T12:10:13.970Z",
-//     "updated_at": "2024-07-24T11:01:21.805Z",
-//     "alumnized_at": null,
-//     "alumni?": false,
-//     "active?": true,
-//     "groups": [],
-//     "image": {
-//         "link": "https://cdn.intra.42.fr/users/20396754573b1890871a5e32487140a6/bducrocq.jpg",
-//         "versions": {
-//             "large": "https://cdn.intra.42.fr/users/2ec0283d024382785590565152f76b69/large_bducrocq.jpg",
-//             "medium": "https://cdn.intra.42.fr/users/f5dc433e0c6e1fcda53775da767f7848/medium_bducrocq.jpg",
-//             "small": "https://cdn.intra.42.fr/users/c218c3e8552d09f6303afce6490c4a98/small_bducrocq.jpg",
-//             "micro": "https://cdn.intra.42.fr/users/76402209cde33ffb9dce239e657d5690/micro_bducrocq.jpg"
-//         }
-//     },
-//     "cursus_users": [],
-//     "projects_users": [],
-//     "languages_users": [],
-//     "achievements": [],
-//     "titles": [],
-//     "titles_users": [],
-//     "campus": [],
-//     "campus_users": []
-//   }''';
-//
-//   Map<String, dynamic> userMap = jsonDecode(jsonString);
-//   User user = User.fromJson(userMap);
-//
-//   // Now you can use the 'user' object in your Flutter app
-//   print(user.image.link);  // prints: https://cdn.intra.42.fr/users/20396754573b1890871a5e32487140a6/bducrocq.jpg
-// }
