@@ -27,9 +27,12 @@ class AuthInterceptor extends Interceptor {
   }
 
   @override
-  void onError(DioError err, ErrorInterceptorHandler handler) async {
+  void onError(DioException err, ErrorInterceptorHandler handler) async {
+    print('*************INTERCEPTOR EROOR *************');
     // Vérifiez si le code d'erreur est 401
     if (err.response?.statusCode == 401) {
+      print('*************INTERCEPTOR EROOR 401 !!! *************');
+
       // Tentez de rafraîchir le token
       bool refreshed = await authService.handleRefreshToken();
       if (refreshed) {

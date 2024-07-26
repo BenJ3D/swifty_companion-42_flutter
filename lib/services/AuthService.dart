@@ -104,7 +104,7 @@ class AuthService {
       await tokenService.saveToken(token.accessToken);
       await tokenService.saveRefreshToken(token.refreshToken);
     } catch (e) {
-      print('Erreur lors de l\'obtention du token: $e');
+      print('Erreur lors de l\'obtention du token via refreshToken: $e');
       return false;
     }
     return false;
@@ -147,21 +147,24 @@ class AuthService {
 
   Future<AuthToken> _refreshToken() async {
     final url = Uri.parse('https://api.intra.42.fr/oauth/token');
+    final tokenRefresh = await tokenService.getRefreshToken();
     final response = await http.post(
       url,
       body: {
         'grant_type': 'refresh_token',
         'client_id': dotenv.env['CLIENT_UID'],
         'client_secret': dotenv.env['CLIENT_SECRET'],
-        'refresh_token': tokenService.getRefreshToken() ?? '',
+        'refresh_token': tokenRefresh ?? '',
         'redirect_uri': dotenv.env['REDIRECT_URI'],
       },
     );
 
     if (response.statusCode == 200) {
+      print('response ======= : ${response.body}');
       return AuthToken.fromJson(json.decode(response.body));
     } else {
-      throw Exception('Échec de l\'obtention du token: ${response.body}');
+      throw Exception(
+          'Échec de l\'obtention du token avec refresh: ${response.body}');
     }
   }
 

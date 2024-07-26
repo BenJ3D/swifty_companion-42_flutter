@@ -8,6 +8,7 @@ import 'package:swifty_companion/domain/user/UserSuggestion.dart';
 
 import '../domain/user/User42.dart';
 import '../services/TokenInterceptor.dart';
+import '../services/TokenService.dart';
 import 'mainProfile.dart';
 
 class HomePage extends StatefulWidget {
@@ -18,11 +19,13 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final dio = Dio();
+  final TokenService tokenService = TokenService();
   late User42 userSelected;
   late List<UserSuggestion> usersSuggestion;
   late UserSearchBar usersSuggestion2;
   late String login = 'login';
-  final dio = Dio();
+  late int cursusSelected; //42cursus = 21 , C piscine = 9
 
   _HomePageState() {
     dio.interceptors.add(AuthInterceptor());
@@ -69,6 +72,7 @@ class _HomePageState extends State<HomePage> {
     fetchData();
   }
 
+  //Initial login fetch
   void fetchData() async {
     try {
       Response response = await dio.get('https://api.intra.42.fr/v2/me');
@@ -81,6 +85,7 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  //Fetch user
   void fetchDataUser(String login) async {
     try {
       Response response =
@@ -93,6 +98,7 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  //Resultat des recherches via login
   Future<List<UserSuggestion>> getSuggestions(String pattern) async {
     if (pattern.isEmpty) {
       return [];
@@ -261,24 +267,36 @@ class _HomePageState extends State<HomePage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          ElevatedButton(
-            onPressed: () => fetchDataUser(login),
-            style: ElevatedButton.styleFrom(
-              foregroundColor: Theme.of(context).primaryColorLight,
-              backgroundColor: Theme.of(context).primaryColor,
-              padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(30),
-              ),
-              elevation: 5,
-            ),
-            child: const Text(
-              'TEST FETCH',
-              style: TextStyle(fontSize: 24),
-            ),
-          ),
+          // dbgTokenButton(context),
         ],
       ),
     );
+  }
+
+  ElevatedButton dbgTokenButton(BuildContext context) {
+    return ElevatedButton(
+      onPressed: () => fetchDataUser(login),
+      style: ElevatedButton.styleFrom(
+        foregroundColor: Theme.of(context).primaryColorLight,
+        backgroundColor: Theme.of(context).primaryColor,
+        padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(30),
+        ),
+        elevation: 5,
+      ),
+      child: const Text(
+        'DELETE TOKEN',
+        style: TextStyle(fontSize: 24),
+      ),
+    );
+  }
+
+  dbgDeleteToken() async {
+    tokenService.deleteToken();
+    String? token = await tokenService.getToken();
+    String? refreshToken = await tokenService.getRefreshToken();
+    print(token);
+    print(refreshToken);
   }
 }
