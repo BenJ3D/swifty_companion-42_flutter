@@ -71,13 +71,10 @@ class _HomePageState extends State<HomePage> {
 
   void fetchData() async {
     try {
-      print('TEST FETCH');
-
       Response response = await dio.get('https://api.intra.42.fr/v2/me');
       print('${response.data['login']}');
       setState(() {
         userSelected = User42.fromJson(response.data);
-        print('*******************${userSelected.login}**********************');
       });
     } catch (e) {
       print('Error: $e');
@@ -86,14 +83,10 @@ class _HomePageState extends State<HomePage> {
 
   void fetchDataUser(String login) async {
     try {
-      print('TEST FETCH USER');
-
       Response response =
           await dio.get('https://api.intra.42.fr/v2/users/$login');
-      print('${response.data['login']}');
       setState(() {
         userSelected = User42.fromJson(response.data);
-        print('*******************${userSelected.login}**********************');
       });
     } catch (e) {
       print('Error: $e');
@@ -105,7 +98,6 @@ class _HomePageState extends State<HomePage> {
       return [];
     }
     try {
-      print('ENTER GET SUGGESTIONS : pattern = **** $pattern ****');
       Response response = await dio.get(
         'https://api.intra.42.fr/v2/users',
         queryParameters: {
@@ -117,7 +109,9 @@ class _HomePageState extends State<HomePage> {
       List<UserSuggestion> suggestions = (response.data as List)
           .map((userData) => UserSuggestion.fromJson(userData))
           .toList();
-
+      setState(() {
+        usersSuggestion = suggestions;
+      });
       return suggestions;
     } catch (e) {
       print('Error fetching suggestions: $e');
@@ -185,9 +179,32 @@ class _HomePageState extends State<HomePage> {
   }
 
   TypeAheadField<UserSuggestion> searchBarTypeAheadField() {
+    TextEditingController _controller = TextEditingController();
     return TypeAheadField<UserSuggestion>(
       suggestionsCallback: (pattern) async {
         return await getSuggestions(pattern);
+      },
+      builder: (context, controller, focusNode) {
+        _controller = controller;
+        return TextField(
+          maxLength: 8,
+          style: const TextStyle(color: Colors.blueGrey),
+          onSubmitted: (String value) {
+            if (usersSuggestion.isNotEmpty &&
+                userSelected.login.toString() != usersSuggestion.first.login) {
+              setState(() {
+                fetchDataUser(usersSuggestion.first.login);
+                controller.clear();
+              });
+            }
+          },
+          controller: controller,
+          focusNode: focusNode,
+          autofocus: false,
+          decoration: const InputDecoration(
+              labelText: 'Search for a 42 login..',
+              labelStyle: TextStyle(color: Colors.grey)),
+        );
       },
       itemBuilder: (context, UserSuggestion suggestion) {
         return Padding(
@@ -232,8 +249,9 @@ class _HomePageState extends State<HomePage> {
         );
       },
       onSelected: (UserSuggestion suggestion) {
-        print("PK????******");
         fetchDataUser(suggestion.login);
+        FocusScope.of(context).unfocus();
+        _controller.clear();
       },
     );
   }

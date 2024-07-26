@@ -4,7 +4,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:swifty_companion/services/TokenInterceptor.dart';
 import 'services/AuthService.dart';
 
-//TODO: clear la search bar quand select user ou UnFocus
+//TODO: gerer changement cursus
 //TODO: Verfier le refresh Token
 //TODO: gerer les cursus
 //TODO: mise en page de toute les info legit sujet

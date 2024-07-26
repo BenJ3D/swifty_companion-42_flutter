@@ -32,7 +32,7 @@ class MainProfile extends StatelessWidget {
                 width: 300,
                 height: 300,
                 child: Image.network(
-                  userSelected.image.versions.medium,
+                  userSelected.image.versions.large,
                   fit: BoxFit.cover,
                   loadingBuilder: (BuildContext context, Widget child,
                       ImageChunkEvent? loadingProgress) {
