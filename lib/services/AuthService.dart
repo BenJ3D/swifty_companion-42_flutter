@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:swifty_companion/main.dart';
+import 'package:swifty_companion/services/NavigatorService.dart';
 import 'package:swifty_companion/services/TokenService.dart';
 import 'package:swifty_companion/tools/AnsiColor.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -87,7 +88,7 @@ class AuthService {
       final token = await _exchangeCodeForToken(code);
       // Utilisez le token comme vous le souhaitez
       print(
-          '${AnsiColor.green.code}Token obtenu: ${token.accessToken}${AnsiColor.reset.code}');
+          '${AnsiColor.magenta.code}Token obtenu: ${AnsiColor.green.code}${token.accessToken}${AnsiColor.reset.code}');
       await tokenService.saveToken(token.accessToken);
       await tokenService.saveRefreshToken(token.refreshToken);
       await tokenService.saveExpiresToken(token.createdAt + token.expiresIn);
@@ -104,30 +105,23 @@ class AuthService {
       final token = await _refreshToken();
       // Utilisez le token comme vous le souhaitez
       print(
-          '${AnsiColor.green.code}Nouveau token obtenu: ${token.accessToken}${AnsiColor.reset.code}');
+          '${AnsiColor.magenta.code}Nouveau token obtenu:${AnsiColor.green.code} ${token.accessToken}${AnsiColor.reset.code}');
       await tokenService.saveToken(token.accessToken);
       await tokenService.saveRefreshToken(token.refreshToken);
       await tokenService.saveExpiresToken(token.createdAt + token.expiresIn);
+      return true;
     } catch (e) {
       print('Erreur lors de l\'obtention du token via refreshToken: $e');
       return false;
     }
-    return false;
   }
 
   void _loginSuccess(BuildContext context) {
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (context) => const HomePage()),
-    );
+    NavigatorService().navigateTo('/profile');
   }
 
   void loginFail(BuildContext context) {
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(
-          builder: (context) => const MyHomePage(
-                title: 'Login Page',
-              )),
-    );
+    NavigatorService().navigateTo('/login');
   }
 
   Future<AuthToken> _exchangeCodeForToken(String code) async {

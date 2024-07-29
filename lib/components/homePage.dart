@@ -125,6 +125,18 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  void _deleteTokenDBG() {
+    tokenService.deleteToken();
+  }
+
+  void _deleteRefreshTokenDBG() {
+    tokenService.deleteRefreshToken();
+  }
+
+  void _printTokenInfoDBG() async {
+    tokenService.printTokenInfo();
+  }
+
   @override
   Widget build(BuildContext context) {
     final orientation = MediaQuery.of(context).orientation;
@@ -132,7 +144,7 @@ class _HomePageState extends State<HomePage> {
 
     return MaterialApp(
       home: DefaultTabController(
-        length: 2,
+        length: 3,
         child: SafeArea(
           child: Scaffold(
             body: Column(
@@ -156,6 +168,7 @@ class _HomePageState extends State<HomePage> {
                         children: <Widget>[
                           MainProfile(userSelected: userSelected),
                           cursusView(context),
+                          debugView(context),
                         ],
                       ),
                     ),
@@ -175,6 +188,7 @@ class _HomePageState extends State<HomePage> {
                 tabs: [
                   Tab(text: 'Profile'),
                   Tab(text: 'Cursus'),
+                  Tab(text: 'DebugApp'),
                 ],
               ),
             ),
@@ -263,11 +277,28 @@ class _HomePageState extends State<HomePage> {
   }
 
   Center cursusView(BuildContext context) {
-    return Center(
+    return const Center(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
+        children: [],
+      ),
+    );
+  }
+
+  Center debugView(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // dbgTokenButton(context),
+          dbgTokenButtonPrintExpire(context),
+          const SizedBox(
+            height: 20,
+          ),
+          dbgTokenButton(context),
+          const SizedBox(
+            height: 20,
+          ),
+          dbgRefreshTokenButton(context)
         ],
       ),
     );
@@ -275,7 +306,7 @@ class _HomePageState extends State<HomePage> {
 
   ElevatedButton dbgTokenButton(BuildContext context) {
     return ElevatedButton(
-      onPressed: () => fetchDataUser(login),
+      onPressed: () => _deleteTokenDBG(),
       style: ElevatedButton.styleFrom(
         foregroundColor: Theme.of(context).primaryColorLight,
         backgroundColor: Theme.of(context).primaryColor,
@@ -287,6 +318,44 @@ class _HomePageState extends State<HomePage> {
       ),
       child: const Text(
         'DELETE TOKEN',
+        style: TextStyle(fontSize: 24),
+      ),
+    );
+  }
+
+  ElevatedButton dbgRefreshTokenButton(BuildContext context) {
+    return ElevatedButton(
+      onPressed: () => _deleteRefreshTokenDBG(),
+      style: ElevatedButton.styleFrom(
+        foregroundColor: Theme.of(context).primaryColorLight,
+        backgroundColor: Theme.of(context).primaryColor,
+        padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(30),
+        ),
+        elevation: 5,
+      ),
+      child: const Text(
+        'DELETE REFRESH TOKEN',
+        style: TextStyle(fontSize: 24),
+      ),
+    );
+  }
+
+  ElevatedButton dbgTokenButtonPrintExpire(BuildContext context) {
+    return ElevatedButton(
+      onPressed: () => _printTokenInfoDBG(),
+      style: ElevatedButton.styleFrom(
+        foregroundColor: Theme.of(context).primaryColorLight,
+        backgroundColor: Theme.of(context).primaryColor,
+        padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(30),
+        ),
+        elevation: 5,
+      ),
+      child: const Text(
+        'PRINT TOKEN INFO',
         style: TextStyle(fontSize: 24),
       ),
     );

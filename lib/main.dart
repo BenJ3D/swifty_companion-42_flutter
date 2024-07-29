@@ -1,9 +1,13 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:swifty_companion/components/homePage.dart';
+import 'package:swifty_companion/components/mainProfile.dart';
 import 'package:swifty_companion/services/TokenInterceptor.dart';
+import 'services/NavigatorService.dart';
 import 'services/AuthService.dart';
 
+//TODO: Rediriger vers la page de login
 //TODO: gerer changement cursus
 //TODO: Verifier le refresh Token
 //TODO: gerer les cursus
@@ -27,6 +31,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: NavigatorService().navigatorKey,
+      routes: {
+        '/login': (context) => const MyHomePage(
+              title: 'Login Page',
+            ),
+        '/profile': (context) => const HomePage()
+      },
       title: 'Swifty Companion',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueGrey),
