@@ -1,13 +1,28 @@
 import 'package:flutter/material.dart';
 import '../domain/user/User42.dart';
 
-class MainProfile extends StatelessWidget {
+class MainProfile extends StatefulWidget {
   const MainProfile({
-    super.key,
+    Key? key,
     required this.userSelected,
-  });
+    required this.cursusUserSelected,
+  }) : super(key: key);
 
   final User42 userSelected;
+  final CursusUser cursusUserSelected;
+
+  @override
+  _MainProfileState createState() => _MainProfileState();
+}
+
+class _MainProfileState extends State<MainProfile> {
+  late CursusUser _currentCursusUser;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentCursusUser = widget.cursusUserSelected;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +47,7 @@ class MainProfile extends StatelessWidget {
                 width: 300,
                 height: 300,
                 child: Image.network(
-                  userSelected.image.versions.large,
+                  widget.userSelected.image.versions.large,
                   fit: BoxFit.cover,
                   loadingBuilder: (BuildContext context, Widget child,
                       ImageChunkEvent? loadingProgress) {
@@ -57,33 +72,31 @@ class MainProfile extends StatelessWidget {
             ),
           ),
           Text(
-            userSelected.login,
+            widget.userSelected.login,
             style: const TextStyle(
                 fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
             textAlign: TextAlign.left,
           ),
           Text(
-            userSelected.email,
+            widget.userSelected.email,
             style: const TextStyle(
                 fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
             textAlign: TextAlign.left,
           ),
           Text(
-            userSelected.firstName ?? '',
+            widget.userSelected.firstName ?? '',
             style: const TextStyle(
                 fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
             textAlign: TextAlign.left,
           ),
           Text(
-            "Year: ${userSelected.poolYear}",
+            "Year: ${widget.userSelected.poolYear}",
             style: const TextStyle(
                 fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
             textAlign: TextAlign.left,
           ),
           Text(
-            userSelected.cursusUsers.isNotEmpty
-                ? "Level: ${userSelected.cursusUsers[0].level}"
-                : "Level information not available",
+            _currentCursusUser.level.toString(),
             style: const TextStyle(
                 fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
             textAlign: TextAlign.left,

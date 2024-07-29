@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'package:swifty_companion/components/DropdownMenuCursus.dart';
 import 'package:swifty_companion/domain/user/UserSearchBar.dart';
 import 'package:swifty_companion/domain/user/UserSuggestion.dart';
 
@@ -22,14 +23,38 @@ class _HomePageState extends State<HomePage> {
   final dio = Dio();
   final TokenService tokenService = TokenService();
   late User42 userSelected;
+  late CursusUser cursusUserSelected;
   late List<UserSuggestion> usersSuggestion;
   late UserSearchBar usersSuggestion2;
   late String login = 'login';
-  late int cursusSelected; //42cursus = 21 , C piscine = 9
 
   _HomePageState() {
     dio.interceptors.add(AuthInterceptor());
-    userSelected = User42(
+    userSelected = user42Init();
+    cursusUserSelected = cursusUserInit();
+    fetchData();
+  }
+
+  CursusUser cursusUserInit() {
+    return CursusUser(
+        level: 0,
+        skills: [],
+        id: 0,
+        beginAt: DateTime.timestamp(),
+        cursusId: 0,
+        hasCoalition: false,
+        createdAt: DateTime.timestamp(),
+        updatedAt: DateTime.timestamp(),
+        cursus: Cursus(
+            createdAt: DateTime.timestamp(),
+            id: 0,
+            kind: '',
+            name: '',
+            slug: ''));
+  }
+
+  User42 user42Init() {
+    return User42(
       id: 0,
       email: '',
       login: 'strooper',
@@ -69,7 +94,6 @@ class _HomePageState extends State<HomePage> {
       campus: [],
       campusUsers: [],
     );
-    fetchData();
   }
 
   //Initial login fetch
@@ -79,6 +103,7 @@ class _HomePageState extends State<HomePage> {
       print('${response.data['login']}');
       setState(() {
         userSelected = User42.fromJson(response.data);
+        cursusUserSelected = userSelected.cursusUsers.last;
       });
     } catch (e) {
       print('Error: $e');
@@ -92,6 +117,7 @@ class _HomePageState extends State<HomePage> {
           await dio.get('https://api.intra.42.fr/v2/users/$login');
       setState(() {
         userSelected = User42.fromJson(response.data);
+        cursusUserSelected = userSelected.cursusUsers.last;
       });
     } catch (e) {
       print('Error: $e');
@@ -150,6 +176,22 @@ class _HomePageState extends State<HomePage> {
             body: Column(
               children: [
                 searchBarTypeAheadField(),
+                Container(
+                    decoration: BoxDecoration(
+                      gradient: RadialGradient(
+                        center: Alignment.topLeft,
+                        colors: [Colors.blueGrey.shade900, Colors.black],
+                        radius: 4,
+                      ),
+                    ),
+                    //TODO: fixer ca
+                    child: DropdownMenuCursus<CursusUser>(
+                      options: userSelected.cursusUsers
+                          .map((cursusUser) => cursusUser.cursus.name)
+                          .toList(),
+                      onChanged: (value) =>
+                          {print('Cursus value changed $value')},
+                    )),
                 Expanded(
                   child: Container(
                     decoration: BoxDecoration(
@@ -166,7 +208,10 @@ class _HomePageState extends State<HomePage> {
                               : 0),
                       child: TabBarView(
                         children: <Widget>[
-                          MainProfile(userSelected: userSelected),
+                          MainProfile(
+                            userSelected: userSelected,
+                            cursusUserSelected: cursusUserSelected,
+                          ),
                           cursusView(context),
                           debugView(context),
                         ],

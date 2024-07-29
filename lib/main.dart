@@ -7,11 +7,10 @@ import 'package:swifty_companion/services/TokenInterceptor.dart';
 import 'services/NavigatorService.dart';
 import 'services/AuthService.dart';
 
-//TODO: Rediriger vers la page de login
 //TODO: gerer changement cursus
-//TODO: Verifier le refresh Token
 //TODO: gerer les cursus
 //TODO: mise en page de toute les info legit sujet
+//TODO: Dont les skills
 //TODO: gerer le token en ouverture d'app pour ne pas reloggin a chaque fois
 //TODO: mettre des loaders ?
 //TODO: gerer les erreur connexion
