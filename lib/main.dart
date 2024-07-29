@@ -5,7 +5,7 @@ import 'package:swifty_companion/services/TokenInterceptor.dart';
 import 'services/AuthService.dart';
 
 //TODO: gerer changement cursus
-//TODO: Verfier le refresh Token
+//TODO: Verifier le refresh Token
 //TODO: gerer les cursus
 //TODO: mise en page de toute les info legit sujet
 //TODO: gerer le token en ouverture d'app pour ne pas reloggin a chaque fois

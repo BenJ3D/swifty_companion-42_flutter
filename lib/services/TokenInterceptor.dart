@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:swifty_companion/services/AuthService.dart';
+import 'package:swifty_companion/tools/AnsiColor.dart';
 import 'TokenService.dart';
 import 'AuthService.dart';
 
@@ -28,10 +29,12 @@ class AuthInterceptor extends Interceptor {
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) async {
-    print('*************INTERCEPTOR EROOR *************');
+    print('*************INTERCEPTOR ERROR *************');
     // Vérifiez si le code d'erreur est 401
     if (err.response?.statusCode == 401) {
-      print('*************INTERCEPTOR EROOR 401 !!! *************');
+      print('${AnsiColor.red.code}************* 401 !!! *************');
+      print(
+          '${AnsiColor.blue.code}************* TRY REFRESH TOKEN *************');
 
       // Tentez de rafraîchir le token
       bool refreshed = await authService.handleRefreshToken();
@@ -59,7 +62,8 @@ class AuthInterceptor extends Interceptor {
           return handler.next(err);
         }
       } else {
-        // Si le rafraîchissement du token échoue, redirigez l'utilisateur vers la page de login ou gérez l'erreur
+        print(
+            '${AnsiColor.red.code}Refresh token fail, please re login${AnsiColor.reset.code}');
         // TODO: Rediriger vers la page de login
       }
     }

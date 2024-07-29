@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:swifty_companion/main.dart';
 import 'package:swifty_companion/services/TokenService.dart';
+import 'package:swifty_companion/tools/AnsiColor.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:app_links/app_links.dart';
 import 'package:http/http.dart' as http;
@@ -85,9 +86,11 @@ class AuthService {
     try {
       final token = await _exchangeCodeForToken(code);
       // Utilisez le token comme vous le souhaitez
-      print('Token obtenu: ${token.accessToken}');
+      print(
+          '${AnsiColor.green.code}Token obtenu: ${token.accessToken}${AnsiColor.reset.code}');
       await tokenService.saveToken(token.accessToken);
       await tokenService.saveRefreshToken(token.refreshToken);
+      await tokenService.saveExpiresToken(token.createdAt + token.expiresIn);
       if (context.mounted) {
         _loginSuccess(context);
       }
@@ -100,9 +103,11 @@ class AuthService {
     try {
       final token = await _refreshToken();
       // Utilisez le token comme vous le souhaitez
-      print('Token obtenu: ${token.accessToken}');
+      print(
+          '${AnsiColor.green.code}Nouveau token obtenu: ${token.accessToken}${AnsiColor.reset.code}');
       await tokenService.saveToken(token.accessToken);
       await tokenService.saveRefreshToken(token.refreshToken);
+      await tokenService.saveExpiresToken(token.createdAt + token.expiresIn);
     } catch (e) {
       print('Erreur lors de l\'obtention du token via refreshToken: $e');
       return false;
