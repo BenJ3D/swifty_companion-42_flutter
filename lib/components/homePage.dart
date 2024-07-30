@@ -189,7 +189,7 @@ class _HomePageState extends State<HomePage> {
 
     return MaterialApp(
       home: DefaultTabController(
-        length: 3,
+        length: 4,
         child: SafeArea(
           child: Scaffold(
             body: Column(
@@ -206,8 +206,8 @@ class _HomePageState extends State<HomePage> {
                     //TODO: fixer ca
                     child: DropdownMenuCursus(
                       options: userSelected.cursusUsers,
-                      cursusDefault:
-                          userCursusDefaultLogic(userSelected.cursusUsers),
+                      cursusDefault: userCursusDefaultLogic(
+                          userSelected.cursusUsers ?? []),
                       onChanged: (CursusUser value) => {
                         print('Cursus id: ${value.cursus.id}'),
                         print('Cursus name: ${value.cursus.name}'),
@@ -215,8 +215,6 @@ class _HomePageState extends State<HomePage> {
                         print('Cursus grade: ${value.grade ?? 'Novice'}'),
                         setState(() {
                           cursusUserSelected = value;
-                          grade = value.grade.toString();
-                          level = value.level;
                         })
                       },
                     )),
@@ -240,7 +238,14 @@ class _HomePageState extends State<HomePage> {
                             userSelected: userSelected,
                             cursusUserSelected: cursusUserSelected,
                           ),
-                          cursusView(context),
+                          cursusTab(
+                              context,
+                              userSelected.projectsUsers
+                                  .where((elem) => elem.cursusIds
+                                      .contains(cursusUserSelected.cursusId))
+                                  .toList(),
+                              orientation),
+                          skillsTab(context),
                           debugView(context),
                         ],
                       ),
@@ -261,6 +266,7 @@ class _HomePageState extends State<HomePage> {
                 tabs: [
                   Tab(text: 'Profile'),
                   Tab(text: 'Cursus'),
+                  Tab(text: 'Skills'),
                   Tab(text: 'DebugApp'),
                 ],
               ),
@@ -349,7 +355,52 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Center cursusView(BuildContext context) {
+  Center cursusTab(BuildContext context, List<ProjectUser> projectUsers,
+      Orientation orientation) {
+    final childAspectRatio =
+        orientation == Orientation.portrait ? 8 / 2 : 8 / 1;
+    return Center(
+      child: GridView.builder(
+        padding: EdgeInsets.all(10),
+        itemCount: projectUsers.length,
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 1, // Nombre de colonnes
+          crossAxisSpacing: 10,
+          mainAxisSpacing: 10,
+          childAspectRatio:
+              childAspectRatio, // Ajustez ce ratio selon vos besoins
+        ),
+        itemBuilder: (context, index) {
+          ProjectUser projectUser = projectUsers[index];
+          return Card(
+            elevation: 3,
+            child: Padding(
+              padding: const EdgeInsets.all(8),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    projectUser.project.name,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 5),
+                  Text(
+                    'Note: ${projectUser.finalMark ?? 'Non noté'}',
+                    style: const TextStyle(fontSize: 16),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Center skillsTab(BuildContext context) {
     return const Center(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
