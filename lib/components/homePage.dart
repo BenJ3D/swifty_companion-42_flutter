@@ -26,6 +26,7 @@ class _HomePageState extends State<HomePage> {
   late CursusUser cursusUserSelected;
   late List<UserSuggestion> usersSuggestion;
   late UserSearchBar usersSuggestion2;
+  late int cursusIdDefault = 0;
   late String login = 'login';
   late double level = 0;
   late String grade = 'Novice';
@@ -105,7 +106,7 @@ class _HomePageState extends State<HomePage> {
       print('${response.data['login']}');
       setState(() {
         userSelected = User42.fromJson(response.data);
-        cursusUserSelected = userSelected.cursusUsers.last;
+        cursusUserSelected = userCursusDefaultLogic(userSelected.cursusUsers);
       });
     } catch (e) {
       print('Error: $e');
@@ -119,10 +120,26 @@ class _HomePageState extends State<HomePage> {
           await dio.get('https://api.intra.42.fr/v2/users/$login');
       setState(() {
         userSelected = User42.fromJson(response.data);
-        cursusUserSelected = userSelected.cursusUsers.last;
+        cursusUserSelected = userCursusDefaultLogic(userSelected.cursusUsers);
+        print('level : ${cursusUserSelected.level}');
       });
     } catch (e) {
       print('Error: $e');
+    }
+  }
+
+  CursusUser userCursusDefaultLogic(List<CursusUser> listCursus) {
+    if (listCursus.length == 1) {
+      return listCursus.first;
+    }
+    try {
+      return listCursus.firstWhere((elem) => elem.cursusId == 21);
+    } catch (e) {
+      try {
+        return listCursus.firstWhere((elem) => elem.cursusId == 9);
+      } catch (e) {
+        return listCursus.first;
+      }
     }
   }
 
@@ -189,6 +206,8 @@ class _HomePageState extends State<HomePage> {
                     //TODO: fixer ca
                     child: DropdownMenuCursus(
                       options: userSelected.cursusUsers,
+                      cursusDefault:
+                          userCursusDefaultLogic(userSelected.cursusUsers),
                       onChanged: (CursusUser value) => {
                         print('Cursus id: ${value.cursus.id}'),
                         print('Cursus name: ${value.cursus.name}'),
