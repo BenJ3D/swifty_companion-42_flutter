@@ -27,6 +27,8 @@ class _HomePageState extends State<HomePage> {
   late List<UserSuggestion> usersSuggestion;
   late UserSearchBar usersSuggestion2;
   late String login = 'login';
+  late double level = 0;
+  late String grade = 'Novice';
 
   _HomePageState() {
     dio.interceptors.add(AuthInterceptor());
@@ -185,12 +187,19 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                     //TODO: fixer ca
-                    child: DropdownMenuCursus<CursusUser>(
-                      options: userSelected.cursusUsers
-                          .map((cursusUser) => cursusUser.cursus.name)
-                          .toList(),
-                      onChanged: (value) =>
-                          {print('Cursus value changed $value')},
+                    child: DropdownMenuCursus(
+                      options: userSelected.cursusUsers,
+                      onChanged: (CursusUser value) => {
+                        print('Cursus id: ${value.cursus.id}'),
+                        print('Cursus name: ${value.cursus.name}'),
+                        print('Cursus level: ${value.level}'),
+                        print('Cursus grade: ${value.grade ?? 'Novice'}'),
+                        setState(() {
+                          cursusUserSelected = value;
+                          grade = value.grade.toString();
+                          level = value.level;
+                        })
+                      },
                     )),
                 Expanded(
                   child: Container(

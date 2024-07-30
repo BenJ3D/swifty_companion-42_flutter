@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import '../domain/user/User42.dart';
 
 class MainProfile extends StatefulWidget {
+  final User42 userSelected;
+  final CursusUser cursusUserSelected;
+
   const MainProfile({
     Key? key,
     required this.userSelected,
     required this.cursusUserSelected,
   }) : super(key: key);
-
-  final User42 userSelected;
-  final CursusUser cursusUserSelected;
 
   @override
   _MainProfileState createState() => _MainProfileState();
@@ -22,6 +22,16 @@ class _MainProfileState extends State<MainProfile> {
   void initState() {
     super.initState();
     _currentCursusUser = widget.cursusUserSelected;
+  }
+
+  @override
+  void didUpdateWidget(covariant MainProfile oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.cursusUserSelected != oldWidget.cursusUserSelected) {
+      setState(() {
+        _currentCursusUser = widget.cursusUserSelected;
+      });
+    }
   }
 
   @override
