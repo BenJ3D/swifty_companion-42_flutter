@@ -123,7 +123,7 @@ class _MainProfileState extends State<MainProfile> {
               ],
             ),
             Text(
-              "Year: ${widget.userSelected.poolYear}",
+              "Pool year: ${widget.userSelected.poolYear}",
               style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
@@ -132,6 +132,14 @@ class _MainProfileState extends State<MainProfile> {
             ),
             Text(
               "Grade: ${widget.cursusUserSelected.grade ?? 'Novice'}",
+              style: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white),
+              textAlign: TextAlign.left,
+            ),
+            Text(
+              "Evaluation points: ${widget.userSelected.correctionPoint}",
               style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,

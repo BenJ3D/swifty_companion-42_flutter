@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_radar_chart/flutter_radar_chart.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:swifty_companion/components/DropdownMenuCursus.dart';
 import 'package:swifty_companion/domain/user/UserSearchBar.dart';
@@ -265,7 +266,7 @@ class _HomePageState extends State<HomePage> {
                 ),
                 tabs: [
                   Tab(text: 'Profile'),
-                  Tab(text: 'Cursus'),
+                  Tab(text: 'Projects'),
                   Tab(text: 'Skills'),
                   Tab(text: 'DebugApp'),
                 ],
@@ -307,13 +308,13 @@ class _HomePageState extends State<HomePage> {
       },
       itemBuilder: (context, UserSuggestion suggestion) {
         return Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(0.0),
           child: Row(
             children: [
               ClipOval(
                   child: SizedBox(
-                      width: 70,
-                      height: 70,
+                      width: 30,
+                      height: 30,
                       child: Image.network(
                         fit: BoxFit.cover,
                         suggestion.image.versions.small,
@@ -388,7 +389,9 @@ class _HomePageState extends State<HomePage> {
                   ),
                   const SizedBox(height: 5),
                   Text(
-                    'Note: ${projectUser.finalMark ?? 'Non noté'}',
+                    projectUser.finalMark != null
+                        ? 'Note: ${projectUser.finalMark}'
+                        : 'En cours',
                     style: const TextStyle(fontSize: 16),
                   ),
                 ],
@@ -401,12 +404,25 @@ class _HomePageState extends State<HomePage> {
   }
 
   Center skillsTab(BuildContext context) {
-    return const Center(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [],
-      ),
-    );
+    late List<String> features =
+        cursusUserSelected.skills.map((elem) => elem.name).toList();
+    if (features.length <= 2) {
+      features.add('');
+      features.add('');
+    }
+    late List<double> data =
+        cursusUserSelected.skills.map((elem) => elem.level).toList();
+    if (data.length <= 2) {
+      data.add(0);
+      data.add(0);
+    }
+    return Center(
+        child: RadarChart.dark(
+            ticks: const [5, 10, 15],
+            features: features,
+            data: [
+              data,
+            ]));
   }
 
   Center debugView(BuildContext context) {
