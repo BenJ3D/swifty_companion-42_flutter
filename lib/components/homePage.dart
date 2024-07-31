@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:swifty_companion/components/DropdownMenuCursus.dart';
 import 'package:swifty_companion/domain/user/UserSearchBar.dart';
@@ -101,11 +102,8 @@ class _HomePageState extends State<HomePage> {
 
   //Initial login fetch
   void fetchData() async {
-    print('HEYYYY');
-    print('\n\nDEBUG DIO: URL : ${widget.dio.options.baseUrl}\n\n');
     try {
       Response response = await widget.dio.get('/v2/me');
-      print('${response.data['login']}');
       setState(() {
         userSelected = User42.fromJson(response.data);
         cursusUserSelected = userCursusDefaultLogic(userSelected!.cursusUsers);
@@ -211,48 +209,38 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final orientation = MediaQuery.of(context).orientation;
     final topPadding = MediaQuery.of(context).padding.top;
+    final bool debugMenuEnable =
+        dotenv.env['DEBUG_MENU'] == 'true' ? true : false;
 
     return MaterialApp(
       home: DefaultTabController(
-        length: 4,
+        length: debugMenuEnable ? 4 : 3,
         child: SafeArea(
-          child: Scaffold(
-            body: loading == false
-                ? Column(
-                    children: [
-                      searchBarTypeAheadField(),
-                      Container(
-                          decoration: BoxDecoration(
-                            gradient: RadialGradient(
-                              center: Alignment.topLeft,
-                              colors: [Colors.blueGrey.shade900, Colors.black],
-                              radius: 4,
-                            ),
-                          ),
-                          //TODO: fixer ca
-                          child: DropdownMenuCursus(
-                            options: userSelected!.cursusUsers,
-                            cursusDefault: userCursusDefaultLogic(
-                                userSelected?.cursusUsers ?? []),
-                            onChanged: (CursusUser value) => {
-                              print('Cursus id: ${value.cursus.id}'),
-                              print('Cursus name: ${value.cursus.name}'),
-                              print('Cursus level: ${value.level}'),
-                              print('Cursus grade: ${value.grade ?? 'Novice'}'),
-                              setState(() {
-                                cursusUserSelected = value;
-                              })
-                            },
-                          )),
-                      Expanded(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            gradient: RadialGradient(
-                              center: Alignment.topLeft,
-                              colors: [Colors.blueGrey.shade900, Colors.black],
-                              radius: 4,
-                            ),
-                          ),
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: RadialGradient(
+                center: Alignment.topLeft,
+                colors: [Colors.blueGrey.shade900, Colors.black],
+                radius: 4,
+              ),
+            ),
+            child: Scaffold(
+              backgroundColor: Colors.transparent,
+              body: loading == false
+                  ? Column(
+                      children: [
+                        searchBarTypeAheadField(),
+                        DropdownMenuCursus(
+                          options: userSelected!.cursusUsers,
+                          cursusDefault: userCursusDefaultLogic(
+                              userSelected?.cursusUsers ?? []),
+                          onChanged: (CursusUser value) => {
+                            setState(() {
+                              cursusUserSelected = value;
+                            })
+                          },
+                        ),
+                        Expanded(
                           child: Padding(
                             padding: EdgeInsets.only(
                                 top: orientation == Orientation.portrait
@@ -279,32 +267,36 @@ class _HomePageState extends State<HomePage> {
                                         .toList(),
                                     orientation),
                                 skillsTab(context, orientation),
-                                debugView(context),
+                                debugMenuEnable
+                                    ? debugView(context)
+                                    : const SizedBox.shrink(),
                               ],
                             ),
                           ),
                         ),
-                      ),
-                    ],
-                  )
-                : Center(
-                    child: LoadingAnimationWidget.hexagonDots(
-                        color: Colors.blueGrey, size: 200)),
-            bottomNavigationBar: Container(
-              decoration: const BoxDecoration(
-                color: Color.fromARGB(240, 0, 0, 0),
-              ),
-              child: const TabBar(
-                labelStyle: TextStyle(
-                  color: Colors.white70,
-                  fontSize: 20,
+                      ],
+                    )
+                  : Center(
+                      child: LoadingAnimationWidget.hexagonDots(
+                          color: Colors.blueGrey, size: 200)),
+              bottomNavigationBar: Container(
+                decoration: const BoxDecoration(
+                  color: Color.fromARGB(240, 0, 0, 0),
                 ),
-                tabs: [
-                  Tab(text: 'Profile'),
-                  Tab(text: 'Marks'),
-                  Tab(text: 'Skills'),
-                  Tab(text: 'DebugApp'),
-                ],
+                child: TabBar(
+                  labelStyle: const TextStyle(
+                    color: Colors.white70,
+                    fontSize: 20,
+                  ),
+                  tabs: [
+                    const Tab(text: 'Profile'),
+                    const Tab(text: 'Marks'),
+                    const Tab(text: 'Skills'),
+                    debugMenuEnable
+                        ? const Tab(text: 'DebugApp')
+                        : const SizedBox.shrink(),
+                  ],
+                ),
               ),
             ),
           ),
@@ -314,16 +306,29 @@ class _HomePageState extends State<HomePage> {
   }
 
   TypeAheadField<UserSuggestion> searchBarTypeAheadField() {
+    bool patternIsEmpty = true;
+
     TextEditingController _controller = TextEditingController();
     return TypeAheadField<UserSuggestion>(
       suggestionsCallback: (pattern) async {
+        if (pattern.isEmpty) {
+          patternIsEmpty = true;
+          return [];
+        }
+        patternIsEmpty = false;
         return await getSuggestions(pattern);
       },
+      hideOnEmpty: patternIsEmpty,
       builder: (context, controller, focusNode) {
         _controller = controller;
         return TextField(
           maxLength: 8,
-          style: const TextStyle(color: Colors.blueGrey),
+          buildCounter: (BuildContext context,
+              {int? currentLength, int? maxLength, bool? isFocused}) {
+            return null;
+          },
+          style: const TextStyle(color: Colors.white),
+          cursorColor: Colors.blue.shade800,
           onSubmitted: (String value) {
             if (usersSuggestion.isNotEmpty &&
                 userSelected!.login.toString() != usersSuggestion.first.login) {
@@ -342,15 +347,16 @@ class _HomePageState extends State<HomePage> {
               labelStyle: TextStyle(color: Colors.grey)),
         );
       },
+      loadingBuilder: (context) => Container(),
       itemBuilder: (context, UserSuggestion suggestion) {
         return Padding(
-          padding: const EdgeInsets.all(0.0),
+          padding: const EdgeInsets.fromLTRB(30, 0, 30, 0),
           child: Row(
             children: [
               ClipOval(
                   child: SizedBox(
-                      width: 30,
-                      height: 30,
+                      width: 42,
+                      height: 42,
                       child: Image.network(
                         fit: BoxFit.cover,
                         suggestion.image.versions.small,
@@ -395,11 +401,16 @@ class _HomePageState extends State<HomePage> {
   Center projectsTab(BuildContext context, List<ProjectUser> projectUsers,
       Orientation orientation) {
     final childAspectRatio =
-        orientation == Orientation.portrait ? 8 / 6 : 8 / 6;
+        orientation == Orientation.portrait ? 8 / 6 : 10 / 6;
     final crossAxisCount = orientation == Orientation.portrait ? 2 : 4;
+    final double projectNameTxtSize =
+        orientation == Orientation.portrait ? 16 : 14;
+    final double projectNoteTxtSize =
+        orientation == Orientation.portrait ? 20 : 16;
+
     return Center(
       child: GridView.builder(
-        padding: EdgeInsets.all(10),
+        padding: const EdgeInsets.all(10),
         itemCount: projectUsers.length,
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: crossAxisCount, // Nombre de colonnes
@@ -424,7 +435,9 @@ class _HomePageState extends State<HomePage> {
                 children: [
                   Text(
                     projectUser.project.name,
-                    style: const TextStyle(fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: projectNameTxtSize),
                     textAlign: TextAlign.center,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -437,12 +450,12 @@ class _HomePageState extends State<HomePage> {
                     style: projectUser.validated == null
                         ? const TextStyle(fontSize: 16)
                         : projectUser.validated == true
-                            ? const TextStyle(
-                                fontSize: 24,
+                            ? TextStyle(
+                                fontSize: projectNoteTxtSize,
                                 color: Colors.green,
                                 fontWeight: FontWeight.w400)
-                            : const TextStyle(
-                                fontSize: 24,
+                            : TextStyle(
+                                fontSize: projectNoteTxtSize,
                                 color: Colors.red,
                                 fontWeight: FontWeight.w400),
                   ),
@@ -457,7 +470,7 @@ class _HomePageState extends State<HomePage> {
 
   Center skillsTab(BuildContext context, Orientation orientation) {
     final childAspectRatio =
-        orientation == Orientation.portrait ? 8 / 6 : 8 / 4;
+        orientation == Orientation.portrait ? 8 / 6 : 10 / 6;
     final crossAxisCount = orientation == Orientation.portrait ? 2 : 4;
     late List<String> features =
         cursusUserSelected!.skills.map((elem) => elem.name).toList();

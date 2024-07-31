@@ -19,11 +19,12 @@ class DropdownMenuCursus extends StatefulWidget {
 class _DropdownMenuCursusState extends State<DropdownMenuCursus> {
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
     return DropdownMenu<CursusUser>(
+      width: screenWidth,
       initialSelection: widget.cursusDefault,
       textStyle: const TextStyle(color: Colors.white),
       onSelected: (CursusUser? value) {
-        // This is called when the user selects an item.
         setState(() {
           widget.onChanged(value!);
         });
