@@ -1,14 +1,16 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:swifty_companion/services/AuthService.dart';
 import 'package:swifty_companion/services/NavigatorService.dart';
 import 'package:swifty_companion/tools/AnsiColor.dart';
 import 'TokenService.dart';
-import 'AuthService.dart';
+import 'ConnectivityService.dart';
 
 class AuthInterceptor extends Interceptor {
   final Dio dio;
   final TokenService tokenService = TokenService();
   final AuthService authService = AuthService();
+  final ConnectivityService connectivityService = ConnectivityService();
 
   AuthInterceptor(this.dio);
 
@@ -16,6 +18,18 @@ class AuthInterceptor extends Interceptor {
   void onRequest(
       RequestOptions options, RequestInterceptorHandler handler) async {
     print('*************INTERCEPTOR INSERT TOKEN*************');
+    // Vérifier la connectivité réseau
+    final connectivityResult = await connectivityService.checkConnectivity();
+    if (connectivityResult == ConnectivityResult.none) {
+      return handler.reject(
+        DioException(
+          requestOptions: options,
+          error: 'No internet connection',
+          type: DioExceptionType.unknown,
+        ),
+      );
+    }
+
     final token = await tokenService.getToken();
     if (token != null) {
       options.headers["Authorization"] = "Bearer $token";
@@ -68,7 +82,9 @@ class AuthInterceptor extends Interceptor {
       } else {
         print(
             '${AnsiColor.red.code}Refresh token fail, please re login${AnsiColor.reset.code}');
-        NavigatorService().navigateTo('/login');
+        // AuthService().loginFail(context);
+        // Navigator.pushReplacementNamed(context, "/login");
+        NavigatorService().navigateToAndRemoveAll('/login');
       }
     }
     // Si l'erreur n'est pas un 401, la traiter normalement

@@ -14,6 +14,13 @@ class NavigatorService {
         ?.pushNamed(routeName, arguments: arguments);
   }
 
+  Future<dynamic>? navigateToAndRemoveAll(String routeName,
+      {dynamic arguments}) {
+    return navigatorKey.currentState?.pushNamedAndRemoveUntil(
+        routeName, (Route<dynamic> route) => false,
+        arguments: arguments);
+  }
+
   void goBack() {
     return navigatorKey.currentState?.pop();
   }

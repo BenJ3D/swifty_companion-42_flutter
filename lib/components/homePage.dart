@@ -173,13 +173,15 @@ class _HomePageState extends State<HomePage> {
       Response response = await widget.dio.get(
         '/v2/users',
         queryParameters: {
-          'range[login]': '$pattern,${pattern}z',
-          'per_page': '5'
+          'range[login]': '$pattern,${pattern}zz',
+          'per_page': '15'
         },
       );
 
       List<UserSuggestion> suggestions = (response.data as List)
           .map((userData) => UserSuggestion.fromJson(userData))
+          .toList()
+          .reversed
           .toList();
       setState(() {
         usersSuggestion = suggestions;
@@ -209,12 +211,10 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final orientation = MediaQuery.of(context).orientation;
     final topPadding = MediaQuery.of(context).padding.top;
-    final bool debugMenuEnable =
-        dotenv.env['DEBUG_MENU'] == 'true' ? true : false;
 
     return MaterialApp(
       home: DefaultTabController(
-        length: debugMenuEnable ? 4 : 3,
+        length: 4, //ACTIVATION DEBUG MENU PASSAGE 3 => 4 ************
         child: SafeArea(
           child: Container(
             decoration: BoxDecoration(
@@ -267,9 +267,8 @@ class _HomePageState extends State<HomePage> {
                                         .toList(),
                                     orientation),
                                 skillsTab(context, orientation),
-                                debugMenuEnable
-                                    ? debugView(context)
-                                    : const SizedBox.shrink(),
+                                debugView(context),
+                                //ACTIVATION DEBUG MENU DECOMMENTER ************
                               ],
                             ),
                           ),
@@ -283,18 +282,18 @@ class _HomePageState extends State<HomePage> {
                 decoration: const BoxDecoration(
                   color: Color.fromARGB(240, 0, 0, 0),
                 ),
-                child: TabBar(
-                  labelStyle: const TextStyle(
+                child: const TabBar(
+                  indicatorColor: Colors.lightBlueAccent,
+                  labelStyle: TextStyle(
                     color: Colors.white70,
                     fontSize: 20,
                   ),
                   tabs: [
-                    const Tab(text: 'Profile'),
-                    const Tab(text: 'Marks'),
-                    const Tab(text: 'Skills'),
-                    debugMenuEnable
-                        ? const Tab(text: 'DebugApp')
-                        : const SizedBox.shrink(),
+                    Tab(text: 'Profile'),
+                    Tab(text: 'Marks'),
+                    Tab(text: 'Skills'),
+                    Tab(text: 'DebugApp'),
+                    //ACTIVATION DEBUG MENU DECOMMENTER ************
                   ],
                 ),
               ),

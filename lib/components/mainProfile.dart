@@ -56,12 +56,12 @@ class _MainProfileState extends State<MainProfile> {
     final percentageLevel = getPercentage(_currentCursusUser.level);
 
     return Center(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+            child: Center(
               child: Text(
                 '${widget.userSelected.firstName} ${widget.userSelected.lastName}',
                 style: const TextStyle(
@@ -71,44 +71,54 @@ class _MainProfileState extends State<MainProfile> {
                 textAlign: TextAlign.left,
               ),
             ),
-            Center(
-              child: Text(
-                getTitleLogin(),
-                style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white54),
-                textAlign: TextAlign.left,
-              ),
+          ),
+          Center(
+            child: Text(
+              getTitleLogin(),
+              style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white54),
+              textAlign: TextAlign.left,
             ),
-            const SizedBox(
-              height: 20,
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          profilePhoto(),
+          const SizedBox(
+            height: 12,
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(8, 0, 8, 3),
+            child: Center(
+              child: percentageBarLevel(
+                  screenWidth, percentageLevelCoeff, level, percentageLevel),
             ),
-            profilePhoto(),
-            const SizedBox(
-              height: 12,
-            ),
-            percentageBarLevel(
-                screenWidth, percentageLevelCoeff, level, percentageLevel),
-            Center(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-                child: Column(
-                  children: [
-                    const SizedBox(
-                      width: 9,
-                    ),
-                    statsCard(
-                      screenWidth,
-                      Center(
-                        child: Row(
-                          children: [
-                            const Icon(
-                              Icons.email_rounded,
-                              color: Colors.white,
-                              size: 33,
-                            ),
-                            Text(
+          ),
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+              child: Column(
+                children: [
+                  const SizedBox(
+                    width: 9,
+                  ),
+                  statsCard(
+                    screenWidth,
+                    Center(
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.email_rounded,
+                            color: Colors.white,
+                            size: 33,
+                          ),
+                          const SizedBox(
+                            width: 8,
+                          ),
+                          Flexible(
+                            child: Text(
                               widget.userSelected.email,
                               style: const TextStyle(
                                   fontSize: 14,
@@ -116,168 +126,203 @@ class _MainProfileState extends State<MainProfile> {
                                   color: Colors.white),
                               textAlign: TextAlign.left,
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
-                    statsCard(
-                      screenWidth,
-                      Center(
-                        child: Row(
-                          children: [
-                            const Icon(
-                              Icons.location_on,
-                              color: Colors.white,
-                              size: 33,
+                  ),
+                  statsCard(
+                    screenWidth,
+                    Center(
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.location_on,
+                            color: Colors.white,
+                            size: 33,
+                          ),
+                          const SizedBox(
+                            width: 8,
+                          ),
+                          Text(
+                            getPrimaryCampusName(),
+                            style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
+                            textAlign: TextAlign.left,
+                          ),
+                          const SizedBox(
+                            width: 12,
+                          ),
+                          const Expanded(
+                            child: Text(
+                              "Location",
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.normal,
+                                  color: Colors.white38),
+                              textAlign: TextAlign.right,
                             ),
-                            Text(
-                              getPrimaryCampusName(),
-                              style: const TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white),
-                              textAlign: TextAlign.left,
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
-                    widget.userSelected.poolYear != ''
-                        ? statsCard(
-                            screenWidth,
-                            Row(
-                              children: [
-                                const Icon(
-                                  Icons.pool,
-                                  color: Colors.white,
-                                  size: 33,
-                                ),
-                                const SizedBox(
-                                  width: 8,
-                                ),
-                                Text(
-                                  widget.userSelected.poolYear,
-                                  style: const TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white),
-                                  textAlign: TextAlign.left,
-                                ),
-                                const SizedBox(
-                                  width: 12,
-                                ),
-                                const Text(
-                                  "( Pool year )",
+                  ),
+                  widget.userSelected.poolYear != ''
+                      ? statsCard(
+                          screenWidth,
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.pool,
+                                color: Colors.white,
+                                size: 33,
+                              ),
+                              const SizedBox(
+                                width: 8,
+                              ),
+                              Text(
+                                widget.userSelected.poolYear,
+                                style: const TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white),
+                                textAlign: TextAlign.left,
+                              ),
+                              const SizedBox(
+                                width: 12,
+                              ),
+                              const Expanded(
+                                child: Text(
+                                  "Pool year",
                                   style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.normal,
                                       color: Colors.white38),
-                                  textAlign: TextAlign.left,
+                                  textAlign: TextAlign.right,
                                 ),
-                              ],
-                            ),
-                          )
-                        : const SizedBox.shrink(),
-                    statsCard(
-                      screenWidth,
-                      Row(
-                        children: [
-                          const Icon(
-                            Icons.account_balance_wallet,
-                            color: Colors.white,
-                            size: 33,
+                              ),
+                            ],
                           ),
-                          const SizedBox(
-                            width: 12,
-                          ),
-                          Text(
-                            '${widget.userSelected.wallet.toString()} ₳',
-                            style: const TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white),
-                            textAlign: TextAlign.left,
-                          ),
-                        ],
-                      ),
-                    ),
-                    statsCard(
-                      screenWidth,
-                      Row(
-                        children: [
-                          const Icon(
-                            Icons.grade_rounded,
-                            color: Colors.white,
-                            size: 33,
-                          ),
-                          const SizedBox(
-                            width: 8,
-                          ),
-                          Text(
-                            widget.cursusUserSelected.grade ?? 'Novice',
-                            style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white),
-                            textAlign: TextAlign.left,
-                          ),
-                          const SizedBox(
-                            width: 12,
-                          ),
-                          const Text(
-                            "( Grade )",
+                        )
+                      : const SizedBox.shrink(),
+                  statsCard(
+                    screenWidth,
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.account_balance_wallet,
+                          color: Colors.white,
+                          size: 33,
+                        ),
+                        const SizedBox(
+                          width: 12,
+                        ),
+                        Text(
+                          '${widget.userSelected.wallet.toString()} ₳',
+                          style: const TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white),
+                          textAlign: TextAlign.left,
+                        ),
+                        const SizedBox(
+                          width: 8,
+                        ),
+                        const Expanded(
+                          child: Text(
+                            "Wallet",
                             style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.normal,
                                 color: Colors.white38),
-                            textAlign: TextAlign.left,
+                            textAlign: TextAlign.right,
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                    statsCard(
-                      screenWidth,
-                      Row(
-                        children: [
-                          const Icon(
-                            Icons.account_balance_sharp,
-                            color: Colors.white,
-                            size: 33,
-                          ),
-                          const SizedBox(
-                            width: 8,
-                          ),
-                          Text(
-                            "${widget.userSelected.correctionPoint}",
-                            style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white),
-                            textAlign: TextAlign.left,
-                          ),
-                          const SizedBox(
-                            width: 12,
-                          ),
-                          const Text(
-                            "( Evaluation points )",
+                  ),
+                  statsCard(
+                    screenWidth,
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.grade_rounded,
+                          color: Colors.white,
+                          size: 33,
+                        ),
+                        const SizedBox(
+                          width: 8,
+                        ),
+                        Text(
+                          widget.cursusUserSelected.grade ?? 'Novice',
+                          style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white),
+                          textAlign: TextAlign.left,
+                        ),
+                        const SizedBox(
+                          width: 12,
+                        ),
+                        const Expanded(
+                          child: Text(
+                            "Grade",
                             style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.normal,
                                 color: Colors.white38),
-                            textAlign: TextAlign.left,
+                            textAlign: TextAlign.right,
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(
-                      width: 13,
+                  ),
+                  statsCard(
+                    screenWidth,
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.account_balance_sharp,
+                          color: Colors.white,
+                          size: 33,
+                        ),
+                        const SizedBox(
+                          width: 8,
+                        ),
+                        Text(
+                          "${widget.userSelected.correctionPoint}",
+                          style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white),
+                          textAlign: TextAlign.left,
+                        ),
+                        const SizedBox(
+                          width: 12,
+                        ),
+                        const Expanded(
+                          child: Text(
+                            "Evaluation points",
+                            style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.normal,
+                                color: Colors.white38),
+                            textAlign: TextAlign.right,
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                  const SizedBox(
+                    width: 13,
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -287,16 +332,17 @@ class _MainProfileState extends State<MainProfile> {
     return Row(
       children: [
         LinearPercentIndicator(
-          barRadius: const Radius.circular(3),
-          lineHeight: 25.0,
-          width: screenWidth,
+          barRadius: const Radius.circular(12),
+          lineHeight: 30.0,
+          width: screenWidth - 20,
           percent: percentageLevelCoeff,
           center: Text(
             'level: ${level.toString()} - $percentageLevel%',
-            style: const TextStyle(fontWeight: FontWeight.w600),
+            style: const TextStyle(
+                fontWeight: FontWeight.w600, color: Colors.white),
           ),
-          backgroundColor: Colors.blueGrey,
-          progressColor: Colors.green.shade600,
+          backgroundColor: Colors.blueGrey.shade700,
+          progressColor: Colors.blue.shade600,
         ),
       ],
     );

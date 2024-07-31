@@ -52,6 +52,8 @@ class AuthService {
   AuthService();
 
   Future<void> init(BuildContext context) async {
+    print("${AnsiColor.magenta.code}BONJOUR ICI LA INIT APP LINKS");
+
     await initAppLinks(context);
   }
 
@@ -117,11 +119,13 @@ class AuthService {
   }
 
   void _loginSuccess(BuildContext context) {
-    NavigatorService().navigateTo('/profile');
+    // NavigatorService().navigateTo('/profile');
+    Navigator.pushReplacementNamed(context, "/profile");
   }
 
   void loginFail(BuildContext context) {
-    NavigatorService().navigateTo('/login');
+    // Navigator.pushReplacementNamed(context, "/login");
+    NavigatorService().navigateToAndRemoveAll('/login');
   }
 
   Future<AuthToken> _exchangeCodeForToken(String code) async {
@@ -167,7 +171,7 @@ class AuthService {
     }
   }
 
-  Future<void> login() async {
+  Future<void> login(BuildContext context) async {
     final Uri url = Uri.parse(dotenv.env['CLIENT_AUTHORIZE_URL'].toString());
     if (!await launchUrl(url)) {
       throw Exception('Could not launch $url');
