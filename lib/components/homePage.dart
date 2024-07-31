@@ -195,10 +195,12 @@ class _HomePageState extends State<HomePage> {
 
   void _deleteTokenDBG() {
     tokenService.deleteToken();
+    _printTokenInfoDBG();
   }
 
   void _deleteRefreshTokenDBG() {
     tokenService.deleteRefreshToken();
+    _printTokenInfoDBG();
   }
 
   void _printTokenInfoDBG() async {
@@ -299,7 +301,7 @@ class _HomePageState extends State<HomePage> {
                 ),
                 tabs: [
                   Tab(text: 'Profile'),
-                  Tab(text: 'Projects'),
+                  Tab(text: 'Marks'),
                   Tab(text: 'Skills'),
                   Tab(text: 'DebugApp'),
                 ],
@@ -393,7 +395,7 @@ class _HomePageState extends State<HomePage> {
   Center projectsTab(BuildContext context, List<ProjectUser> projectUsers,
       Orientation orientation) {
     final childAspectRatio =
-        orientation == Orientation.portrait ? 8 / 6 : 8 / 4;
+        orientation == Orientation.portrait ? 8 / 6 : 8 / 6;
     final crossAxisCount = orientation == Orientation.portrait ? 2 : 4;
     return Center(
       child: GridView.builder(
@@ -586,13 +588,5 @@ class _HomePageState extends State<HomePage> {
         style: TextStyle(fontSize: 24),
       ),
     );
-  }
-
-  dbgDeleteToken() async {
-    tokenService.deleteToken();
-    String? token = await tokenService.getToken();
-    String? refreshToken = await tokenService.getRefreshToken();
-    print(token);
-    print(refreshToken);
   }
 }
