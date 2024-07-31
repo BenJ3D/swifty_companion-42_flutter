@@ -23,7 +23,7 @@ void main() async {
       receiveTimeout: const Duration(seconds: 10));
 
   final dio = Dio(options);
-  dio.interceptors.add(AuthInterceptor());
+  dio.interceptors.add(AuthInterceptor(dio));
 
   // print('\n\n***********************DIOOOOOOO \n${dio.options.baseUrl}\n\n');
 

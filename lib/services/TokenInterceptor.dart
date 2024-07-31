@@ -6,8 +6,11 @@ import 'TokenService.dart';
 import 'AuthService.dart';
 
 class AuthInterceptor extends Interceptor {
-  TokenService tokenService = TokenService();
-  AuthService authService = AuthService();
+  final Dio dio;
+  final TokenService tokenService = TokenService();
+  final AuthService authService = AuthService();
+
+  AuthInterceptor(this.dio);
 
   @override
   void onRequest(
@@ -46,14 +49,13 @@ class AuthInterceptor extends Interceptor {
           method: err.requestOptions.method,
           headers: err.requestOptions.headers,
         );
-
         // Relancez la requête avec le nouveau token
         try {
           final token = await tokenService.getToken();
           if (token != null) {
             err.requestOptions.headers["Authorization"] = "Bearer $token";
           }
-          final cloneReq = await Dio().request(
+          final cloneReq = await dio.request(
             err.requestOptions.path,
             options: opts,
             data: err.requestOptions.data,
@@ -67,7 +69,6 @@ class AuthInterceptor extends Interceptor {
         print(
             '${AnsiColor.red.code}Refresh token fail, please re login${AnsiColor.reset.code}');
         NavigatorService().navigateTo('/login');
-        // TODO: Rediriger vers la page de login
       }
     }
     // Si l'erreur n'est pas un 401, la traiter normalement

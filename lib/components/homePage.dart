@@ -268,7 +268,7 @@ class _HomePageState extends State<HomePage> {
                                         ),
                                       )
                                     : const Text(''),
-                                cursusTab(
+                                projectsTab(
                                     context,
                                     userSelected!.projectsUsers
                                         .where((elem) => elem.cursusIds
@@ -390,7 +390,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Center cursusTab(BuildContext context, List<ProjectUser> projectUsers,
+  Center projectsTab(BuildContext context, List<ProjectUser> projectUsers,
       Orientation orientation) {
     final childAspectRatio =
         orientation == Orientation.portrait ? 8 / 6 : 8 / 4;
@@ -409,6 +409,11 @@ class _HomePageState extends State<HomePage> {
         itemBuilder: (context, index) {
           ProjectUser projectUser = projectUsers[index];
           return Card(
+            color: projectUser.validated != null
+                ? projectUser.validated == true
+                    ? null
+                    : Colors.red.shade100
+                : null,
             elevation: 3,
             child: Padding(
               padding: const EdgeInsets.all(8),
@@ -425,9 +430,19 @@ class _HomePageState extends State<HomePage> {
                   const SizedBox(height: 5),
                   Text(
                     projectUser.finalMark != null
-                        ? 'Note: ${projectUser.finalMark}'
-                        : 'En cours',
-                    style: const TextStyle(fontSize: 16),
+                        ? '${projectUser.finalMark}'
+                        : projectUser.status,
+                    style: projectUser.validated == null
+                        ? const TextStyle(fontSize: 16)
+                        : projectUser.validated == true
+                            ? const TextStyle(
+                                fontSize: 24,
+                                color: Colors.green,
+                                fontWeight: FontWeight.w400)
+                            : const TextStyle(
+                                fontSize: 24,
+                                color: Colors.red,
+                                fontWeight: FontWeight.w400),
                   ),
                 ],
               ),
@@ -468,6 +483,7 @@ class _HomePageState extends State<HomePage> {
         itemBuilder: (context, index) {
           String skill = features[index];
           return Card(
+            color: Colors.blueGrey.shade700,
             elevation: 3,
             child: Padding(
               padding: const EdgeInsets.all(8),
@@ -476,15 +492,16 @@ class _HomePageState extends State<HomePage> {
                 children: [
                   Text(
                     skill,
-                    style: const TextStyle(fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold, color: Colors.white),
                     textAlign: TextAlign.center,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 5),
                   Text(
-                    data[index].toString(),
-                    style: const TextStyle(fontSize: 16),
+                    data[index].toStringAsFixed(2),
+                    style: const TextStyle(fontSize: 16, color: Colors.white),
                   ),
                 ],
               ),
@@ -493,13 +510,6 @@ class _HomePageState extends State<HomePage> {
         },
       ),
     );
-    // return Center(
-    //     child: RadarChart.dark(
-    //         ticks: const [5, 10, 15, 21],
-    //         features: features,
-    //         data: [
-    //           data,
-    //         ]));
   }
 
   Center debugView(BuildContext context) {
