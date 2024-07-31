@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../domain/user/User42.dart';
+import 'package:percent_indicator/percent_indicator.dart';
 
 class MainProfile extends StatefulWidget {
   final User42 userSelected;
@@ -36,6 +37,22 @@ class _MainProfileState extends State<MainProfile> {
 
   @override
   Widget build(BuildContext context) {
+    double getPercentageCoef(double number) {
+      return number - number.toInt();
+    }
+
+    int getLevel(double number) {
+      return number.toInt();
+    }
+
+    int getPercentage(double number) {
+      return ((getPercentageCoef(number) * 100).round()).toInt();
+    }
+
+    final percentageLevelCoeff = getPercentageCoef(_currentCursusUser.level);
+    final level = getLevel(_currentCursusUser.level);
+    final percentageLevel = getPercentage(_currentCursusUser.level);
+
     return Center(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
@@ -146,13 +163,26 @@ class _MainProfileState extends State<MainProfile> {
                   color: Colors.white),
               textAlign: TextAlign.left,
             ),
-            Text(
-              _currentCursusUser.level.toString(),
-              style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white),
-              textAlign: TextAlign.left,
+            Row(
+              children: [
+                LinearPercentIndicator(
+                  lineHeight: 25.0,
+                  width: 300.0,
+                  percent: percentageLevelCoeff,
+                  center:
+                      Text('level: ${level.toString()} - $percentageLevel%'),
+                  backgroundColor: Colors.blueGrey,
+                  progressColor: Colors.blue.shade600,
+                ),
+                // Text(
+                //   _currentCursusUser.level.toString(),
+                //   style: const TextStyle(
+                //       fontSize: 24,
+                //       fontWeight: FontWeight.bold,
+                //       color: Colors.white),
+                //   textAlign: TextAlign.left,
+                // ),
+              ],
             ),
             Row(
               children: [

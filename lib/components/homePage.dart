@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_radar_chart/flutter_radar_chart.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
@@ -259,9 +260,12 @@ class _HomePageState extends State<HomePage> {
                               children: <Widget>[
                                 userSelected != null &&
                                         cursusUserSelected != null
-                                    ? MainProfile(
-                                        userSelected: userSelected!,
-                                        cursusUserSelected: cursusUserSelected!,
+                                    ? SingleChildScrollView(
+                                        child: MainProfile(
+                                          userSelected: userSelected!,
+                                          cursusUserSelected:
+                                              cursusUserSelected!,
+                                        ),
                                       )
                                     : const Text(''),
                                 cursusTab(
@@ -331,7 +335,8 @@ class _HomePageState extends State<HomePage> {
           focusNode: focusNode,
           autofocus: false,
           decoration: const InputDecoration(
-              labelText: 'Search for a 42 login..',
+              contentPadding: EdgeInsets.fromLTRB(12, 22, 12, 4),
+              labelText: 'search login...',
               labelStyle: TextStyle(color: Colors.grey)),
         );
       },
