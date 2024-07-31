@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_radar_chart/flutter_radar_chart.dart';
@@ -7,6 +5,8 @@ import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:swifty_companion/components/DropdownMenuCursus.dart';
 import 'package:swifty_companion/domain/user/UserSearchBar.dart';
 import 'package:swifty_companion/domain/user/UserSuggestion.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:percent_indicator/percent_indicator.dart';
 
 import '../domain/user/User42.dart';
 import '../services/TokenInterceptor.dart';
@@ -23,8 +23,9 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final dio = Dio();
   final TokenService tokenService = TokenService();
-  late User42 userSelected;
-  late CursusUser cursusUserSelected;
+  late bool loading = true;
+  late User42? userSelected;
+  late CursusUser? cursusUserSelected;
   late List<UserSuggestion> usersSuggestion;
   late UserSearchBar usersSuggestion2;
   late int cursusIdDefault = 0;
@@ -34,8 +35,6 @@ class _HomePageState extends State<HomePage> {
 
   _HomePageState() {
     dio.interceptors.add(AuthInterceptor());
-    userSelected = user42Init();
-    cursusUserSelected = cursusUserInit();
     fetchData();
   }
 
@@ -107,7 +106,8 @@ class _HomePageState extends State<HomePage> {
       print('${response.data['login']}');
       setState(() {
         userSelected = User42.fromJson(response.data);
-        cursusUserSelected = userCursusDefaultLogic(userSelected.cursusUsers);
+        cursusUserSelected = userCursusDefaultLogic(userSelected!.cursusUsers);
+        loading = false;
       });
     } catch (e) {
       print('Error: $e');
@@ -117,14 +117,19 @@ class _HomePageState extends State<HomePage> {
   //Fetch user
   void fetchDataUser(String login) async {
     try {
+      loading = true;
       Response response =
           await dio.get('https://api.intra.42.fr/v2/users/$login');
       setState(() {
         userSelected = User42.fromJson(response.data);
-        cursusUserSelected = userCursusDefaultLogic(userSelected.cursusUsers);
-        print('level : ${cursusUserSelected.level}');
+        if (userSelected?.cursusUsers != null) {
+          cursusUserSelected =
+              userCursusDefaultLogic(userSelected!.cursusUsers);
+          loading = false;
+        }
       });
     } catch (e) {
+      loading = false;
       print('Error: $e');
     }
   }
@@ -139,7 +144,23 @@ class _HomePageState extends State<HomePage> {
       try {
         return listCursus.firstWhere((elem) => elem.cursusId == 9);
       } catch (e) {
-        return listCursus.first;
+        return listCursus.isEmpty
+            ? CursusUser(
+                level: 0,
+                skills: [],
+                id: 0,
+                beginAt: DateTime.now(),
+                cursusId: 0,
+                hasCoalition: false,
+                createdAt: DateTime.now(),
+                updatedAt: DateTime.now(),
+                cursus: Cursus(
+                    createdAt: DateTime.now(),
+                    id: 0,
+                    kind: '',
+                    name: '',
+                    slug: ''))
+            : listCursus.first;
       }
     }
   }
@@ -193,68 +214,76 @@ class _HomePageState extends State<HomePage> {
         length: 4,
         child: SafeArea(
           child: Scaffold(
-            body: Column(
-              children: [
-                searchBarTypeAheadField(),
-                Container(
-                    decoration: BoxDecoration(
-                      gradient: RadialGradient(
-                        center: Alignment.topLeft,
-                        colors: [Colors.blueGrey.shade900, Colors.black],
-                        radius: 4,
-                      ),
-                    ),
-                    //TODO: fixer ca
-                    child: DropdownMenuCursus(
-                      options: userSelected.cursusUsers,
-                      cursusDefault: userCursusDefaultLogic(
-                          userSelected.cursusUsers ?? []),
-                      onChanged: (CursusUser value) => {
-                        print('Cursus id: ${value.cursus.id}'),
-                        print('Cursus name: ${value.cursus.name}'),
-                        print('Cursus level: ${value.level}'),
-                        print('Cursus grade: ${value.grade ?? 'Novice'}'),
-                        setState(() {
-                          cursusUserSelected = value;
-                        })
-                      },
-                    )),
-                Expanded(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      gradient: RadialGradient(
-                        center: Alignment.topLeft,
-                        colors: [Colors.blueGrey.shade900, Colors.black],
-                        radius: 4,
-                      ),
-                    ),
-                    child: Padding(
-                      padding: EdgeInsets.only(
-                          top: orientation == Orientation.portrait
-                              ? topPadding + 0
-                              : 0),
-                      child: TabBarView(
-                        children: <Widget>[
-                          MainProfile(
-                            userSelected: userSelected,
-                            cursusUserSelected: cursusUserSelected,
+            body: loading == false
+                ? Column(
+                    children: [
+                      searchBarTypeAheadField(),
+                      Container(
+                          decoration: BoxDecoration(
+                            gradient: RadialGradient(
+                              center: Alignment.topLeft,
+                              colors: [Colors.blueGrey.shade900, Colors.black],
+                              radius: 4,
+                            ),
                           ),
-                          cursusTab(
-                              context,
-                              userSelected.projectsUsers
-                                  .where((elem) => elem.cursusIds
-                                      .contains(cursusUserSelected.cursusId))
-                                  .toList(),
-                              orientation),
-                          skillsTab(context),
-                          debugView(context),
-                        ],
+                          //TODO: fixer ca
+                          child: DropdownMenuCursus(
+                            options: userSelected!.cursusUsers,
+                            cursusDefault: userCursusDefaultLogic(
+                                userSelected?.cursusUsers ?? []),
+                            onChanged: (CursusUser value) => {
+                              print('Cursus id: ${value.cursus.id}'),
+                              print('Cursus name: ${value.cursus.name}'),
+                              print('Cursus level: ${value.level}'),
+                              print('Cursus grade: ${value.grade ?? 'Novice'}'),
+                              setState(() {
+                                cursusUserSelected = value;
+                              })
+                            },
+                          )),
+                      Expanded(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            gradient: RadialGradient(
+                              center: Alignment.topLeft,
+                              colors: [Colors.blueGrey.shade900, Colors.black],
+                              radius: 4,
+                            ),
+                          ),
+                          child: Padding(
+                            padding: EdgeInsets.only(
+                                top: orientation == Orientation.portrait
+                                    ? topPadding + 0
+                                    : 0),
+                            child: TabBarView(
+                              children: <Widget>[
+                                userSelected != null &&
+                                        cursusUserSelected != null
+                                    ? MainProfile(
+                                        userSelected: userSelected!,
+                                        cursusUserSelected: cursusUserSelected!,
+                                      )
+                                    : const Text(''),
+                                cursusTab(
+                                    context,
+                                    userSelected!.projectsUsers
+                                        .where((elem) => elem.cursusIds
+                                            .contains(
+                                                cursusUserSelected!.cursusId))
+                                        .toList(),
+                                    orientation),
+                                skillsTab(context, orientation),
+                                debugView(context),
+                              ],
+                            ),
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
+                    ],
+                  )
+                : Center(
+                    child: LoadingAnimationWidget.hexagonDots(
+                        color: Colors.blueGrey, size: 200)),
             bottomNavigationBar: Container(
               decoration: const BoxDecoration(
                 color: Color.fromARGB(240, 0, 0, 0),
@@ -291,7 +320,7 @@ class _HomePageState extends State<HomePage> {
           style: const TextStyle(color: Colors.blueGrey),
           onSubmitted: (String value) {
             if (usersSuggestion.isNotEmpty &&
-                userSelected.login.toString() != usersSuggestion.first.login) {
+                userSelected!.login.toString() != usersSuggestion.first.login) {
               setState(() {
                 fetchDataUser(usersSuggestion.first.login);
                 controller.clear();
@@ -359,13 +388,14 @@ class _HomePageState extends State<HomePage> {
   Center cursusTab(BuildContext context, List<ProjectUser> projectUsers,
       Orientation orientation) {
     final childAspectRatio =
-        orientation == Orientation.portrait ? 8 / 2 : 8 / 1;
+        orientation == Orientation.portrait ? 8 / 6 : 8 / 4;
+    final crossAxisCount = orientation == Orientation.portrait ? 2 : 4;
     return Center(
       child: GridView.builder(
         padding: EdgeInsets.all(10),
         itemCount: projectUsers.length,
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 1, // Nombre de colonnes
+          crossAxisCount: crossAxisCount, // Nombre de colonnes
           crossAxisSpacing: 10,
           mainAxisSpacing: 10,
           childAspectRatio:
@@ -403,26 +433,68 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Center skillsTab(BuildContext context) {
+  Center skillsTab(BuildContext context, Orientation orientation) {
+    final childAspectRatio =
+        orientation == Orientation.portrait ? 8 / 6 : 8 / 4;
+    final crossAxisCount = orientation == Orientation.portrait ? 2 : 4;
     late List<String> features =
-        cursusUserSelected.skills.map((elem) => elem.name).toList();
+        cursusUserSelected!.skills.map((elem) => elem.name).toList();
     if (features.length <= 2) {
       features.add('');
       features.add('');
     }
     late List<double> data =
-        cursusUserSelected.skills.map((elem) => elem.level).toList();
+        cursusUserSelected!.skills.map((elem) => elem.level).toList();
     if (data.length <= 2) {
       data.add(0);
       data.add(0);
     }
     return Center(
-        child: RadarChart.dark(
-            ticks: const [5, 10, 15],
-            features: features,
-            data: [
-              data,
-            ]));
+      child: GridView.builder(
+        padding: const EdgeInsets.all(10),
+        itemCount: features.length,
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: crossAxisCount, // Nombre de colonnes
+          crossAxisSpacing: 10,
+          mainAxisSpacing: 10,
+          childAspectRatio:
+              childAspectRatio, // Ajustez ce ratio selon vos besoins
+        ),
+        itemBuilder: (context, index) {
+          String skill = features[index];
+          return Card(
+            elevation: 3,
+            child: Padding(
+              padding: const EdgeInsets.all(8),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    skill,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 5),
+                  Text(
+                    data[index].toString(),
+                    style: const TextStyle(fontSize: 16),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+    // return Center(
+    //     child: RadarChart.dark(
+    //         ticks: const [5, 10, 15, 21],
+    //         features: features,
+    //         data: [
+    //           data,
+    //         ]));
   }
 
   Center debugView(BuildContext context) {

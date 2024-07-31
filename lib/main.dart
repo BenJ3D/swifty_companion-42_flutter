@@ -7,8 +7,6 @@ import 'package:swifty_companion/services/TokenInterceptor.dart';
 import 'services/NavigatorService.dart';
 import 'services/AuthService.dart';
 
-//TODO: reactualiser level
-//TODO: gerer ecran rouge demarrage init valeur null
 //TODO: mise en page de toute les info legit sujet
 //TODO: Dont les skills
 //TODO: gerer le token en ouverture d'app pour ne pas reloggin a chaque fois
