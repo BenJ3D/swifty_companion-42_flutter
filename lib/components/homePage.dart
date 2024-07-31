@@ -1,28 +1,26 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_radar_chart/flutter_radar_chart.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:swifty_companion/components/DropdownMenuCursus.dart';
 import 'package:swifty_companion/domain/user/UserSearchBar.dart';
 import 'package:swifty_companion/domain/user/UserSuggestion.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
-import 'package:percent_indicator/percent_indicator.dart';
 
 import '../domain/user/User42.dart';
-import '../services/TokenInterceptor.dart';
 import '../services/TokenService.dart';
 import 'mainProfile.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final Dio dio;
+
+  const HomePage({super.key, required this.dio});
 
   @override
   _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-  final dio = Dio();
   final TokenService tokenService = TokenService();
   late bool loading = true;
   late User42? userSelected;
@@ -34,8 +32,9 @@ class _HomePageState extends State<HomePage> {
   late double level = 0;
   late String grade = 'Novice';
 
-  _HomePageState() {
-    dio.interceptors.add(AuthInterceptor());
+  @override
+  void initState() {
+    super.initState();
     fetchData();
   }
 
@@ -102,8 +101,10 @@ class _HomePageState extends State<HomePage> {
 
   //Initial login fetch
   void fetchData() async {
+    print('HEYYYY');
+    print('\n\nDEBUG DIO: URL : ${widget.dio.options.baseUrl}\n\n');
     try {
-      Response response = await dio.get('https://api.intra.42.fr/v2/me');
+      Response response = await widget.dio.get('/v2/me');
       print('${response.data['login']}');
       setState(() {
         userSelected = User42.fromJson(response.data);
@@ -119,8 +120,7 @@ class _HomePageState extends State<HomePage> {
   void fetchDataUser(String login) async {
     try {
       loading = true;
-      Response response =
-          await dio.get('https://api.intra.42.fr/v2/users/$login');
+      Response response = await widget.dio.get('/v2/users/$login');
       setState(() {
         userSelected = User42.fromJson(response.data);
         if (userSelected?.cursusUsers != null) {
@@ -172,8 +172,8 @@ class _HomePageState extends State<HomePage> {
       return [];
     }
     try {
-      Response response = await dio.get(
-        'https://api.intra.42.fr/v2/users',
+      Response response = await widget.dio.get(
+        '/v2/users',
         queryParameters: {
           'range[login]': '$pattern,${pattern}z',
           'per_page': '5'

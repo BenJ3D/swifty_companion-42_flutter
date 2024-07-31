@@ -17,14 +17,23 @@ import 'services/AuthService.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");
-  final dio = Dio();
+  BaseOptions options = BaseOptions(
+      baseUrl: 'https://api.intra.42.fr',
+      connectTimeout: const Duration(seconds: 10),
+      receiveTimeout: const Duration(seconds: 10));
+
+  final dio = Dio(options);
   dio.interceptors.add(AuthInterceptor());
 
-  runApp(const MyApp());
+  // print('\n\n***********************DIOOOOOOO \n${dio.options.baseUrl}\n\n');
+
+  runApp(MyApp(dio: dio));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final Dio dio;
+
+  const MyApp({super.key, required this.dio});
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +43,9 @@ class MyApp extends StatelessWidget {
         '/login': (context) => const MyHomePage(
               title: 'Login Page',
             ),
-        '/profile': (context) => const HomePage()
+        '/profile': (context) => HomePage(
+              dio: dio,
+            )
       },
       title: 'Swifty Companion',
       theme: ThemeData(
