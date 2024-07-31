@@ -514,21 +514,23 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Center debugView(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          dbgTokenButtonPrintExpire(context),
-          const SizedBox(
-            height: 20,
-          ),
-          dbgTokenButton(context),
-          const SizedBox(
-            height: 20,
-          ),
-          dbgRefreshTokenButton(context)
-        ],
+  SingleChildScrollView debugView(BuildContext context) {
+    return SingleChildScrollView(
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            dbgTokenButtonPrintExpire(context),
+            const SizedBox(
+              height: 20,
+            ),
+            dbgTokenButton(context),
+            const SizedBox(
+              height: 20,
+            ),
+            dbgRefreshTokenButton(context)
+          ],
+        ),
       ),
     );
   }
