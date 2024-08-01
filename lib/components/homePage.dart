@@ -1,7 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:swifty_companion/components/DropdownMenuCursus.dart';
 import 'package:swifty_companion/domain/user/UserSearchBar.dart';
@@ -407,64 +406,71 @@ class _HomePageState extends State<HomePage> {
     final double projectNoteTxtSize =
         orientation == Orientation.portrait ? 20 : 16;
 
-    return Center(
-      child: GridView.builder(
-        padding: const EdgeInsets.all(10),
-        itemCount: projectUsers.length,
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: crossAxisCount, // Nombre de colonnes
-          crossAxisSpacing: 10,
-          mainAxisSpacing: 10,
-          childAspectRatio:
-              childAspectRatio, // Ajustez ce ratio selon vos besoins
-        ),
-        itemBuilder: (context, index) {
-          ProjectUser projectUser = projectUsers[index];
-          return Card(
-            color: projectUser.validated != null
-                ? projectUser.validated == true
-                    ? null
-                    : Colors.red.shade100
-                : null,
-            elevation: 3,
-            child: Padding(
-              padding: const EdgeInsets.all(8),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    projectUser.project.name,
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: projectNameTxtSize),
-                    textAlign: TextAlign.center,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 5),
-                  Text(
-                    projectUser.finalMark != null
-                        ? '${projectUser.finalMark}'
-                        : projectUser.status,
-                    style: projectUser.validated == null
-                        ? const TextStyle(fontSize: 16)
-                        : projectUser.validated == true
-                            ? TextStyle(
-                                fontSize: projectNoteTxtSize,
-                                color: Colors.green,
-                                fontWeight: FontWeight.w400)
-                            : TextStyle(
-                                fontSize: projectNoteTxtSize,
-                                color: Colors.red,
-                                fontWeight: FontWeight.w400),
-                  ),
-                ],
+    return projectUsers.isEmpty
+        ? const Center(
+            child: Text(
+              'NO PROJECTS',
+              style: TextStyle(color: Colors.white38, fontSize: 40),
+            ),
+          )
+        : Center(
+            child: GridView.builder(
+              padding: const EdgeInsets.all(10),
+              itemCount: projectUsers.length,
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: crossAxisCount, // Nombre de colonnes
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
+                childAspectRatio:
+                    childAspectRatio, // Ajustez ce ratio selon vos besoins
               ),
+              itemBuilder: (context, index) {
+                ProjectUser projectUser = projectUsers[index];
+                return Card(
+                  color: projectUser.validated != null
+                      ? projectUser.validated == true
+                          ? null
+                          : Colors.red.shade100
+                      : null,
+                  elevation: 3,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          projectUser.project.name,
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: projectNameTxtSize),
+                          textAlign: TextAlign.center,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 5),
+                        Text(
+                          projectUser.finalMark != null
+                              ? '${projectUser.finalMark}'
+                              : projectUser.status,
+                          style: projectUser.validated == null
+                              ? const TextStyle(fontSize: 16)
+                              : projectUser.validated == true
+                                  ? TextStyle(
+                                      fontSize: projectNoteTxtSize,
+                                      color: Colors.green,
+                                      fontWeight: FontWeight.w400)
+                                  : TextStyle(
+                                      fontSize: projectNoteTxtSize,
+                                      color: Colors.red,
+                                      fontWeight: FontWeight.w400),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
             ),
           );
-        },
-      ),
-    );
   }
 
   Center skillsTab(BuildContext context, Orientation orientation) {
@@ -473,57 +479,56 @@ class _HomePageState extends State<HomePage> {
     final crossAxisCount = orientation == Orientation.portrait ? 2 : 4;
     late List<String> features =
         cursusUserSelected!.skills.map((elem) => elem.name).toList();
-    if (features.length <= 2) {
-      features.add('');
-      features.add('');
-    }
     late List<double> data =
         cursusUserSelected!.skills.map((elem) => elem.level).toList();
-    if (data.length <= 2) {
-      data.add(0);
-      data.add(0);
-    }
-    return Center(
-      child: GridView.builder(
-        padding: const EdgeInsets.all(10),
-        itemCount: features.length,
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: crossAxisCount, // Nombre de colonnes
-          crossAxisSpacing: 10,
-          mainAxisSpacing: 10,
-          childAspectRatio:
-              childAspectRatio, // Ajustez ce ratio selon vos besoins
-        ),
-        itemBuilder: (context, index) {
-          String skill = features[index];
-          return Card(
-            color: Colors.blueGrey.shade700,
-            elevation: 3,
-            child: Padding(
-              padding: const EdgeInsets.all(8),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    skill,
-                    style: const TextStyle(
-                        fontWeight: FontWeight.bold, color: Colors.white),
-                    textAlign: TextAlign.center,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 5),
-                  Text(
-                    data[index].toStringAsFixed(2),
-                    style: const TextStyle(fontSize: 16, color: Colors.white),
-                  ),
-                ],
+    return features.isEmpty
+        ? const Center(
+            child: Text(
+            'NO SKILLS',
+            style: TextStyle(color: Colors.white38, fontSize: 40),
+          ))
+        : Center(
+            child: GridView.builder(
+              padding: const EdgeInsets.all(10),
+              itemCount: features.length,
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: crossAxisCount, // Nombre de colonnes
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
+                childAspectRatio:
+                    childAspectRatio, // Ajustez ce ratio selon vos besoins
               ),
+              itemBuilder: (context, index) {
+                String skill = features[index];
+                return Card(
+                  color: Colors.blueGrey.shade700,
+                  elevation: 3,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          skill,
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold, color: Colors.white),
+                          textAlign: TextAlign.center,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 5),
+                        Text(
+                          data[index].toStringAsFixed(2),
+                          style: const TextStyle(
+                              fontSize: 16, color: Colors.white),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
             ),
           );
-        },
-      ),
-    );
   }
 
   SingleChildScrollView debugView(BuildContext context) {
