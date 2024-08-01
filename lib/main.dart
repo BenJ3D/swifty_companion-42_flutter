@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -87,6 +89,11 @@ class _MyHomePageState extends State<MyHomePage> {
   void login42() {
     setState(() {
       loading = true;
+    });
+    Timer(const Duration(seconds: 10), () {
+      setState(() {
+        loading = false;
+      });
     });
     _authService.login(context);
   }

@@ -215,6 +215,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final orientation = MediaQuery.of(context).orientation;
     final topPadding = MediaQuery.of(context).padding.top;
+    double screenWidth = MediaQuery.of(context).size.width;
 
     return MaterialApp(
       home: DefaultTabController(
@@ -233,17 +234,9 @@ class _HomePageState extends State<HomePage> {
               body: loading == false
                   ? Column(
                       children: [
-                        searchBarTypeAheadField(),
-                        DropdownMenuCursus(
-                          options: userSelected!.cursusUsers,
-                          cursusDefault: userCursusDefaultLogic(
-                              userSelected?.cursusUsers ?? []),
-                          onChanged: (CursusUser value) => {
-                            setState(() {
-                              cursusUserSelected = value;
-                            })
-                          },
-                        ),
+                        orientation == Orientation.portrait
+                            ? mainBar()
+                            : mainBarVertical(),
                         Expanded(
                           child: Padding(
                             padding: EdgeInsets.only(
@@ -308,6 +301,50 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  Row mainBarVertical() {
+    return Row(
+      children: [
+        Expanded(flex: 2, child: searchBarTypeAheadField()),
+        Expanded(
+          flex: 1,
+          child: DropdownMenuCursus(
+            options: userSelected!.cursusUsers,
+            cursusDefault:
+                userCursusDefaultLogic(userSelected?.cursusUsers ?? []),
+            onChanged: (CursusUser value) => {
+              setState(() {
+                cursusUserSelected = value;
+              })
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Column mainBar() {
+    return Column(children: [
+      Row(
+        children: [
+          Expanded(flex: 2, child: searchBarTypeAheadField()),
+        ],
+      ),
+      Expanded(
+        flex: 1,
+        child: DropdownMenuCursus(
+          options: userSelected!.cursusUsers,
+          cursusDefault:
+              userCursusDefaultLogic(userSelected?.cursusUsers ?? []),
+          onChanged: (CursusUser value) => {
+            setState(() {
+              cursusUserSelected = value;
+            })
+          },
+        ),
+      ),
+    ]);
+  }
+
   TypeAheadField<UserSuggestion> searchBarTypeAheadField() {
     bool patternIsEmpty = true;
 
@@ -345,7 +382,7 @@ class _HomePageState extends State<HomePage> {
           focusNode: focusNode,
           autofocus: false,
           decoration: const InputDecoration(
-              contentPadding: EdgeInsets.fromLTRB(12, 22, 12, 4),
+              contentPadding: EdgeInsets.fromLTRB(12, 10, 12, 4),
               labelText: 'search login...',
               labelStyle: TextStyle(color: Colors.grey)),
         );

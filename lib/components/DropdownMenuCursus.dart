@@ -21,7 +21,7 @@ class _DropdownMenuCursusState extends State<DropdownMenuCursus> {
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     return DropdownMenu<CursusUser>(
-      width: screenWidth,
+      width: screenWidth / 3,
       initialSelection: widget.cursusDefault,
       textStyle: const TextStyle(color: Colors.white),
       onSelected: (CursusUser? value) {
