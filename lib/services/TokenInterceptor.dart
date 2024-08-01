@@ -34,7 +34,7 @@ class AuthInterceptor extends Interceptor {
     if (token != null) {
       options.headers["Authorization"] = "Bearer $token";
     } else {
-      // TODO: Gérer le cas où il n'y a pas de token, par exemple rediriger vers un écran de login
+      NavigatorService().navigateToAndRemoveAll('/login');
     }
     super.onRequest(options, handler);
   }
@@ -47,7 +47,7 @@ class AuthInterceptor extends Interceptor {
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) async {
-    print('*************INTERCEPTOR ERROR *************');
+    print('************* INTERCEPTOR ERROR *************');
     // Vérifiez si le code d'erreur est 401
     if (err.response?.statusCode == 401) {
       print(
@@ -82,8 +82,6 @@ class AuthInterceptor extends Interceptor {
       } else {
         print(
             '${AnsiColor.red.code}Refresh token fail, please re login${AnsiColor.reset.code}');
-        // AuthService().loginFail(context);
-        // Navigator.pushReplacementNamed(context, "/login");
         NavigatorService().navigateToAndRemoveAll('/login');
       }
     }

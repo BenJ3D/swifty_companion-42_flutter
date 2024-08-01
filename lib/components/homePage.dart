@@ -1,11 +1,11 @@
 import 'package:dio/dio.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:swifty_companion/components/DropdownMenuCursus.dart';
 import 'package:swifty_companion/domain/user/UserSearchBar.dart';
 import 'package:swifty_companion/domain/user/UserSuggestion.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:swifty_companion/services/NavigatorService.dart';
 
 import '../domain/user/User42.dart';
 import '../services/TokenService.dart';
@@ -106,10 +106,13 @@ class _HomePageState extends State<HomePage> {
       setState(() {
         userSelected = User42.fromJson(response.data);
         cursusUserSelected = userCursusDefaultLogic(userSelected!.cursusUsers);
-        loading = false;
+        setState(() {
+          loading = false;
+        });
       });
     } catch (e) {
       print('Error: $e');
+      NavigatorService().navigateToAndRemoveAll('/login');
     }
   }
 
@@ -123,12 +126,14 @@ class _HomePageState extends State<HomePage> {
         if (userSelected?.cursusUsers != null) {
           cursusUserSelected =
               userCursusDefaultLogic(userSelected!.cursusUsers);
-          loading = false;
+          setState(() {
+            loading = false;
+          });
         }
       });
     } catch (e) {
-      loading = false;
       print('Error: $e');
+      NavigatorService().navigateToAndRemoveAll('/login');
     }
   }
 

@@ -8,6 +8,7 @@ import 'services/NavigatorService.dart';
 import 'services/AuthService.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 
+//TODO: deplacer selecteur de cursus sur meme ligne search login ?
 //TODO: gerer le token en ouverture d'app pour ne pas reloggin a chaque fois
 //TODO: bull notif si erreur
 //TODO: background image login avec logo ?
@@ -16,8 +17,8 @@ void main() async {
   await dotenv.load(fileName: ".env");
   BaseOptions options = BaseOptions(
     baseUrl: 'https://api.intra.42.fr',
-    connectTimeout: const Duration(seconds: 10),
-    receiveTimeout: const Duration(seconds: 10),
+    connectTimeout: const Duration(seconds: 30),
+    receiveTimeout: const Duration(seconds: 30),
   );
 
   final dio = Dio(options);
@@ -36,7 +37,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       navigatorKey: NavigatorService().navigatorKey,
       routes: {
-        '/login': (context) => const MyHomePage(
+        '/login': (context) => MyHomePage(
               title: 'Swifty Companion',
             ),
         '/profile': (context) => HomePage(
@@ -48,13 +49,13 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueGrey),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Swifty Companion'),
+      home: MyHomePage(title: 'Swifty Companion'),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+  MyHomePage({super.key, required this.title});
 
   final String title;
 
@@ -66,10 +67,12 @@ class _MyHomePageState extends State<MyHomePage> {
   late AuthService _authService;
   final ConnectivityService _connectivityService = ConnectivityService();
   late Stream<ConnectivityResult> _connectivityStream;
+  late bool loading;
 
   @override
   void initState() {
     super.initState();
+    loading = false;
     _authService = AuthService();
     _authService.init(context);
     _connectivityStream = _connectivityService.connectivityStream;
@@ -79,6 +82,13 @@ class _MyHomePageState extends State<MyHomePage> {
   void dispose() {
     _authService.dispose();
     super.dispose();
+  }
+
+  void login42() {
+    setState(() {
+      loading = true;
+    });
+    _authService.login(context);
   }
 
   @override
@@ -108,23 +118,25 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
           body: Center(
-            child: ElevatedButton(
-              onPressed: () => _authService.login(context),
-              style: ElevatedButton.styleFrom(
-                foregroundColor: Theme.of(context).primaryColorLight,
-                backgroundColor: Theme.of(context).primaryColor,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30),
-                ),
-                elevation: 5,
-              ),
-              child: const Text(
-                'Login 42',
-                style: TextStyle(fontSize: 24),
-              ),
-            ),
+            child: loading == true
+                ? const Text('')
+                : ElevatedButton(
+                    onPressed: () => login42(),
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Theme.of(context).primaryColorLight,
+                      backgroundColor: Theme.of(context).primaryColor,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 50, vertical: 15),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      elevation: 5,
+                    ),
+                    child: const Text(
+                      'Login 42',
+                      style: TextStyle(fontSize: 24),
+                    ),
+                  ),
           ),
         );
       },

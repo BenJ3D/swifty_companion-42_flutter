@@ -52,8 +52,6 @@ class AuthService {
   AuthService();
 
   Future<void> init(BuildContext context) async {
-    print("${AnsiColor.magenta.code}BONJOUR ICI LA INIT APP LINKS");
-
     await initAppLinks(context);
   }
 
