@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:swifty_companion/components/homePage.dart';
 import 'package:swifty_companion/services/ConnectivityService.dart';
 import 'package:swifty_companion/services/TokenInterceptor.dart';
@@ -89,7 +90,7 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       loading = true;
     });
-    _timer = Timer(const Duration(seconds: 10), () {
+    _timer = Timer(const Duration(seconds: 30), () {
       setState(() {
         loading = false;
       });
@@ -125,7 +126,9 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           body: Center(
             child: loading == true
-                ? const Text('')
+                ? Center(
+                    child: LoadingAnimationWidget.hexagonDots(
+                        color: Colors.blueGrey, size: 200))
                 : ElevatedButton(
                     onPressed: () => login42(),
                     style: ElevatedButton.styleFrom(
