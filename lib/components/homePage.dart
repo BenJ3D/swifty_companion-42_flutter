@@ -30,7 +30,6 @@ class _HomePageState extends State<HomePage> {
   late User42? userSelected;
   late CursusUser? cursusUserSelected;
   late List<UserSuggestion> usersSuggestion;
-  late UserSearchBar usersSuggestion2;
   late int cursusIdDefault = 0;
   late String login = 'login';
   late double level = 0;
@@ -274,7 +273,10 @@ class _HomePageState extends State<HomePage> {
                   ? Column(
                       children: [
                         orientation == Orientation.landscape
-                            ? mainBar(handleTap)
+                            ? Padding(
+                                padding: const EdgeInsets.fromLTRB(0, 0, 0, 8),
+                                child: mainBar(handleTap),
+                              )
                             : mainBarVertical(screenWidth, handleTap),
                         Expanded(
                           child: Padding(
@@ -368,24 +370,14 @@ class _HomePageState extends State<HomePage> {
           children: [
             Expanded(
               flex: 4,
-              child: searchBarTypeAheadField(),
+              child: Container(
+                  margin: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                  color: Colors.white10,
+                  child: searchBarTypeAheadField()),
             ),
             Expanded(
               flex: 1,
-              child: ElevatedButton(
-                  onPressed: () => logout(),
-                  onLongPress: () => {handleTap()},
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    backgroundColor: Colors.blueGrey.shade700,
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 5, vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                    elevation: 5,
-                  ),
-                  child: const Icon(Icons.logout)),
+              child: logoutButton(handleTap),
             ),
           ],
         ),
@@ -406,39 +398,49 @@ class _HomePageState extends State<HomePage> {
   Row mainBar(Function handleTap) {
     return Row(
       children: [
-        Expanded(flex: 5, child: searchBarTypeAheadField()),
+        Expanded(
+            flex: 5,
+            child: Container(
+                color: Colors.white10, child: searchBarTypeAheadField())),
         Expanded(
           flex: 3,
-          child: DropdownMenuCursus(
-            options: userSelected!.cursusUsers,
-            cursusDefault:
-                userCursusDefaultLogic(userSelected?.cursusUsers ?? []),
-            onChanged: (CursusUser value) => {
-              setState(() {
-                cursusUserSelected = value;
-              })
-            },
+          child: Container(
+            color: Colors.white10,
+            child: DropdownMenuCursus(
+              options: userSelected!.cursusUsers,
+              cursusDefault:
+                  userCursusDefaultLogic(userSelected?.cursusUsers ?? []),
+              onChanged: (CursusUser value) => {
+                setState(() {
+                  cursusUserSelected = value;
+                })
+              },
+            ),
           ),
         ),
         Expanded(
           flex: 1,
-          child: ElevatedButton(
-              onPressed: () => logout(),
-              onLongPress: () => handleTap(),
-              style: ElevatedButton.styleFrom(
-                foregroundColor: Colors.white,
-                backgroundColor: Colors.blueGrey.shade700,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 5, vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(5),
-                ),
-                elevation: 5,
-              ),
-              child: const Icon(Icons.logout)),
+          child: logoutButton(handleTap),
         )
       ],
     );
+  }
+
+  ElevatedButton logoutButton(Function handleTap) {
+    return ElevatedButton(
+        onPressed: () => logout(),
+        onLongPress: () => {handleTap()},
+        style: ElevatedButton.styleFrom(
+          foregroundColor: Colors.white,
+          backgroundColor: Colors.white10,
+          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 16),
+          shadowColor: Colors.transparent,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(0),
+          ),
+          elevation: 5,
+        ),
+        child: const Icon(Icons.logout));
   }
 
   TypeAheadField<UserSuggestion> searchBarTypeAheadField() {
@@ -464,7 +466,7 @@ class _HomePageState extends State<HomePage> {
             return null;
           },
           style: const TextStyle(color: Colors.white),
-          cursorColor: Colors.blue.shade800,
+          cursorColor: Colors.white,
           onSubmitted: (String value) {
             if (usersSuggestion.isNotEmpty &&
                 userSelected!.login.toString() != usersSuggestion.first.login) {
@@ -478,9 +480,18 @@ class _HomePageState extends State<HomePage> {
           focusNode: focusNode,
           autofocus: false,
           decoration: const InputDecoration(
-              contentPadding: EdgeInsets.fromLTRB(12, 10, 12, 4),
-              labelText: 'search login...',
-              labelStyle: TextStyle(color: Colors.grey)),
+            contentPadding: EdgeInsets.fromLTRB(12, 12, 12, 4),
+            labelText: 'search login...',
+            labelStyle: TextStyle(color: Colors.grey),
+            focusedBorder: UnderlineInputBorder(
+              borderSide: BorderSide(
+                  color: Colors.blue, width: 2), // Changez la couleur ici
+            ),
+            enabledBorder: UnderlineInputBorder(
+              borderSide: BorderSide(
+                  color: Colors.transparent), // Couleur quand pas en focus
+            ),
+          ),
         );
       },
       loadingBuilder: (context) => Container(),

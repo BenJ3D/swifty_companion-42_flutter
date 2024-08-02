@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../domain/user/User42.dart';
 
@@ -25,6 +26,16 @@ class _DropdownMenuCursusState extends State<DropdownMenuCursus> {
       width:
           orientation == Orientation.portrait ? screenWidth : screenWidth / 3,
       initialSelection: widget.cursusDefault,
+      inputDecorationTheme: const InputDecorationTheme(
+        border: InputBorder.none,
+        fillColor: Colors.transparent,
+        filled: true,
+        contentPadding: EdgeInsets.fromLTRB(8, 0, 8, 0),
+      ),
+      menuStyle: MenuStyle(
+        backgroundColor: WidgetStateProperty.all(
+            Colors.white), // Couleur de fond du menu déroulé
+      ),
       textStyle: const TextStyle(color: Colors.white),
       onSelected: (CursusUser? value) {
         setState(() {
