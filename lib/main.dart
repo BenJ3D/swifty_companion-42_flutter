@@ -141,7 +141,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     : Expanded(
                         child: Image.asset(
                           isAntiAlias: true,
-                          'lib/assets/logoSwifty.webp',
+                          'lib/assets/logoSwiftyOld.webp',
                           fit: BoxFit.contain,
                         ),
                       ),
