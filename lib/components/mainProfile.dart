@@ -5,12 +5,14 @@ import 'package:percent_indicator/percent_indicator.dart';
 class MainProfile extends StatefulWidget {
   final User42 userSelected;
   final CursusUser cursusUserSelected;
+  final bool debugMode;
 
   const MainProfile({
-    Key? key,
+    super.key,
     required this.userSelected,
     required this.cursusUserSelected,
-  }) : super(key: key);
+    required this.debugMode,
+  });
 
   @override
   _MainProfileState createState() => _MainProfileState();
@@ -222,7 +224,7 @@ class _MainProfileState extends State<MainProfile> {
                         Text(
                           '${widget.userSelected.wallet.toString()} ₳',
                           style: const TextStyle(
-                              fontSize: 24,
+                              fontSize: 20,
                               fontWeight: FontWeight.bold,
                               color: Colors.white),
                           textAlign: TextAlign.left,
@@ -354,7 +356,9 @@ class _MainProfileState extends State<MainProfile> {
         shape: BoxShape.circle,
         boxShadow: [
           BoxShadow(
-            color: Colors.blueAccent.withOpacity(0.4),
+            color: widget.debugMode
+                ? Colors.redAccent.withOpacity(0.4)
+                : Colors.blueAccent.withOpacity(0.4),
             spreadRadius: 7,
             blurRadius: 8,
             offset: const Offset(0, 0),
