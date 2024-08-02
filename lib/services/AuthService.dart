@@ -67,12 +67,28 @@ class AuthService {
     });
 
     try {
-      final initialUri = await _appLinks.getInitialLink();
-      if (initialUri != null && context.mounted) {
-        _handleIncomingLink(initialUri, context);
+      debugPrint('${AnsiColor.red.code}TEST DEBUG${AnsiColor.reset.code}');
+      String? token = await tokenService.getToken();
+      if (token != null) {
+        var headers = {'Authorization': 'Bearer $token'};
+        var request = http.Request(
+            'GET', Uri.parse('https://api.intra.42.fr/oauth/token/info'));
+
+        request.headers.addAll(headers);
+
+        http.StreamedResponse response = await request.send();
+
+        if (response.statusCode == 200) {
+          print(
+              '${AnsiColor.magenta.code}${await response.stream.bytesToString()}${AnsiColor.reset.code}');
+          print('${AnsiColor.blue.code}$token${AnsiColor.reset.code}');
+          NavigatorService().navigateToAndRemoveAll('/profile');
+        } else {
+          print('No valid token in local storage');
+        }
       }
     } catch (e) {
-      debugPrint('Erreur lors de la récupération du lien initial: $e');
+      debugPrint('No valid token in local storage');
     }
   }
 
@@ -87,7 +103,7 @@ class AuthService {
     try {
       final token = await _exchangeCodeForToken(code);
       // Utilisez le token comme vous le souhaitez
-      print(
+      debugPrint(
           '${AnsiColor.magenta.code}Token obtenu: ${AnsiColor.green.code}${token.accessToken}${AnsiColor.reset.code}');
       await tokenService.saveToken(token.accessToken);
       await tokenService.saveRefreshToken(token.refreshToken);
@@ -117,12 +133,10 @@ class AuthService {
   }
 
   void _loginSuccess(BuildContext context) {
-    // NavigatorService().navigateTo('/profile');
     Navigator.pushReplacementNamed(context, "/profile");
   }
 
   void loginFail(BuildContext context) {
-    // Navigator.pushReplacementNamed(context, "/login");
     NavigatorService().navigateToAndRemoveAll('/login');
   }
 
