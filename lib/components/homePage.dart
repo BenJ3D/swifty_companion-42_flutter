@@ -1,10 +1,10 @@
 import 'dart:async';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:swifty_companion/components/DropdownMenuCursus.dart';
-import 'package:swifty_companion/domain/user/UserSearchBar.dart';
 import 'package:swifty_companion/domain/user/UserSuggestion.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:swifty_companion/services/AuthService.dart';
@@ -339,10 +339,11 @@ class _HomePageState extends State<HomePage> {
                           color: Colors.blueGrey, size: 200)),
               bottomNavigationBar: Container(
                 decoration: const BoxDecoration(
-                  color: Color.fromARGB(240, 0, 0, 0),
+                  color: Color.fromARGB(120, 0, 0, 0),
                 ),
                 child: const TabBar(
                   indicatorColor: Colors.lightBlueAccent,
+                  dividerHeight: 0,
                   labelStyle: TextStyle(
                     color: Colors.white70,
                     fontSize: 20,
@@ -351,8 +352,6 @@ class _HomePageState extends State<HomePage> {
                     Tab(text: 'Profile'),
                     Tab(text: 'Marks'),
                     Tab(text: 'Skills'),
-                    // Tab(text: 'DebugApp'),
-                    //ACTIVATION DEBUG MENU DECOMMENTER ************
                   ],
                 ),
               ),
@@ -366,20 +365,23 @@ class _HomePageState extends State<HomePage> {
   Column mainBarVertical(double screenWidth, Function handleTap) {
     return Column(
       children: [
-        Row(
-          children: [
-            Expanded(
-              flex: 4,
-              child: Container(
-                  margin: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-                  color: Colors.white10,
-                  child: searchBarTypeAheadField()),
-            ),
-            Expanded(
-              flex: 1,
-              child: logoutButton(handleTap),
-            ),
-          ],
+        Container(
+          color: Colors.white10,
+          child: Row(
+            children: [
+              Expanded(
+                flex: 4,
+                child: Container(
+                    margin: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                    // color: Colors.white10,
+                    child: searchBarTypeAheadField()),
+              ),
+              Expanded(
+                flex: 1,
+                child: logoutButton(handleTap),
+              ),
+            ],
+          ),
         ),
         DropdownMenuCursus(
           options: userSelected!.cursusUsers,
@@ -395,17 +397,14 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Row mainBar(Function handleTap) {
-    return Row(
-      children: [
-        Expanded(
-            flex: 5,
-            child: Container(
-                color: Colors.white10, child: searchBarTypeAheadField())),
-        Expanded(
-          flex: 3,
-          child: Container(
-            color: Colors.white10,
+  Container mainBar(Function handleTap) {
+    return Container(
+      color: Colors.white10,
+      child: Row(
+        children: [
+          Expanded(flex: 5, child: searchBarTypeAheadField()),
+          Expanded(
+            flex: 3,
             child: DropdownMenuCursus(
               options: userSelected!.cursusUsers,
               cursusDefault:
@@ -417,12 +416,12 @@ class _HomePageState extends State<HomePage> {
               },
             ),
           ),
-        ),
-        Expanded(
-          flex: 1,
-          child: logoutButton(handleTap),
-        )
-      ],
+          Expanded(
+            flex: 1,
+            child: logoutButton(handleTap),
+          )
+        ],
+      ),
     );
   }
 
@@ -433,7 +432,7 @@ class _HomePageState extends State<HomePage> {
         style: ElevatedButton.styleFrom(
           foregroundColor: Colors.white,
           backgroundColor: Colors.white10,
-          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 17),
           shadowColor: Colors.transparent,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(0),
