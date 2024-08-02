@@ -10,10 +10,7 @@ import 'services/NavigatorService.dart';
 import 'services/AuthService.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 
-//TODO: deplacer selecteur de cursus sur meme ligne search login ?
 //TODO: gerer le token en ouverture d'app pour ne pas reloggin a chaque fois
-//TODO: bull notif si erreur
-//TODO: background image login avec logo ?
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");
@@ -70,6 +67,7 @@ class _MyHomePageState extends State<MyHomePage> {
   final ConnectivityService _connectivityService = ConnectivityService();
   late Stream<ConnectivityResult> _connectivityStream;
   late bool loading;
+  Timer? _timer;
 
   @override
   void initState() {
@@ -82,6 +80,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   void dispose() {
+    _timer?.cancel();
     _authService.dispose();
     super.dispose();
   }
@@ -90,7 +89,7 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       loading = true;
     });
-    Timer(const Duration(seconds: 10), () {
+    _timer = Timer(const Duration(seconds: 10), () {
       setState(() {
         loading = false;
       });

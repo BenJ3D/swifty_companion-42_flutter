@@ -5,6 +5,7 @@ import 'package:swifty_companion/components/DropdownMenuCursus.dart';
 import 'package:swifty_companion/domain/user/UserSearchBar.dart';
 import 'package:swifty_companion/domain/user/UserSuggestion.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:swifty_companion/services/AuthService.dart';
 import 'package:swifty_companion/services/NavigatorService.dart';
 
 import '../domain/user/User42.dart';
@@ -211,6 +212,12 @@ class _HomePageState extends State<HomePage> {
     tokenService.printTokenInfo();
   }
 
+  void logout() {
+    AuthService().tokenService.deleteToken();
+    AuthService().tokenService.deleteRefreshToken();
+    NavigatorService().navigateToAndRemoveAll('/login');
+  }
+
   @override
   Widget build(BuildContext context) {
     final orientation = MediaQuery.of(context).orientation;
@@ -234,9 +241,9 @@ class _HomePageState extends State<HomePage> {
               body: loading == false
                   ? Column(
                       children: [
-                        orientation == Orientation.portrait
+                        orientation == Orientation.landscape
                             ? mainBar()
-                            : mainBarVertical(),
+                            : mainBarVertical(screenWidth),
                         Expanded(
                           child: Padding(
                             padding: EdgeInsets.only(
@@ -301,12 +308,53 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Row mainBarVertical() {
+  Column mainBarVertical(double screenWidth) {
+    return Column(
+      children: [
+        searchBarTypeAheadField(),
+        Row(
+          children: [
+            Expanded(
+              flex: 4,
+              child: DropdownMenuCursus(
+                options: userSelected!.cursusUsers,
+                cursusDefault:
+                    userCursusDefaultLogic(userSelected?.cursusUsers ?? []),
+                onChanged: (CursusUser value) => {
+                  setState(() {
+                    cursusUserSelected = value;
+                  })
+                },
+              ),
+            ),
+            Expanded(
+              flex: 1,
+              child: ElevatedButton(
+                  onPressed: () => logout(),
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    backgroundColor: Colors.blueGrey.shade700,
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 5, vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    elevation: 5,
+                  ),
+                  child: const Icon(Icons.logout)),
+            )
+          ],
+        ),
+      ],
+    );
+  }
+
+  Row mainBar() {
     return Row(
       children: [
-        Expanded(flex: 2, child: searchBarTypeAheadField()),
+        Expanded(flex: 5, child: searchBarTypeAheadField()),
         Expanded(
-          flex: 1,
+          flex: 3,
           child: DropdownMenuCursus(
             options: userSelected!.cursusUsers,
             cursusDefault:
@@ -318,31 +366,24 @@ class _HomePageState extends State<HomePage> {
             },
           ),
         ),
+        Expanded(
+          flex: 1,
+          child: ElevatedButton(
+              onPressed: () => logout(),
+              style: ElevatedButton.styleFrom(
+                foregroundColor: Colors.white,
+                backgroundColor: Colors.blueGrey.shade700,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 5, vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(5),
+                ),
+                elevation: 5,
+              ),
+              child: const Icon(Icons.logout)),
+        )
       ],
     );
-  }
-
-  Column mainBar() {
-    return Column(children: [
-      Row(
-        children: [
-          Expanded(flex: 2, child: searchBarTypeAheadField()),
-        ],
-      ),
-      Expanded(
-        flex: 1,
-        child: DropdownMenuCursus(
-          options: userSelected!.cursusUsers,
-          cursusDefault:
-              userCursusDefaultLogic(userSelected?.cursusUsers ?? []),
-          onChanged: (CursusUser value) => {
-            setState(() {
-              cursusUserSelected = value;
-            })
-          },
-        ),
-      ),
-    ]);
   }
 
   TypeAheadField<UserSuggestion> searchBarTypeAheadField() {
