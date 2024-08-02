@@ -22,9 +22,8 @@ class _DropdownMenuCursusState extends State<DropdownMenuCursus> {
     double screenWidth = MediaQuery.of(context).size.width;
     Orientation orientation = MediaQuery.of(context).orientation;
     return DropdownMenu<CursusUser>(
-      width: orientation == Orientation.portrait
-          ? screenWidth - (screenWidth / 5)
-          : screenWidth / 3,
+      width:
+          orientation == Orientation.portrait ? screenWidth : screenWidth / 3,
       initialSelection: widget.cursusDefault,
       textStyle: const TextStyle(color: Colors.white),
       onSelected: (CursusUser? value) {

@@ -67,7 +67,6 @@ class AuthService {
     });
 
     try {
-      debugPrint('${AnsiColor.red.code}TEST DEBUG${AnsiColor.reset.code}');
       String? token = await tokenService.getToken();
       if (token != null) {
         var headers = {'Authorization': 'Bearer $token'};

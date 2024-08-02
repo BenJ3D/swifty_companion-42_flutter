@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
@@ -24,6 +26,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final TokenService tokenService = TokenService();
   late bool loading = true;
+  late bool debugMenu = false;
   late User42? userSelected;
   late CursusUser? cursusUserSelected;
   late List<UserSuggestion> usersSuggestion;
@@ -226,10 +229,36 @@ class _HomePageState extends State<HomePage> {
     final orientation = MediaQuery.of(context).orientation;
     final topPadding = MediaQuery.of(context).padding.top;
     double screenWidth = MediaQuery.of(context).size.width;
+    int tapCount = 0;
+    Timer? resetTapTimer;
+
+    void executeQuickTapAction() {
+      setState(() {
+        debugMenu = !debugMenu;
+      });
+      if (debugMenu) {
+        print("Debug menu ON");
+      } else {
+        print("Debug menu OFF");
+      }
+    }
+
+    handleTap() {
+      tapCount++;
+      resetTapTimer?.cancel();
+      resetTapTimer = Timer(const Duration(seconds: 2), () {
+        tapCount = 0;
+      });
+
+      if (tapCount >= 3) {
+        executeQuickTapAction();
+        tapCount = 0;
+      }
+    }
 
     return MaterialApp(
       home: DefaultTabController(
-        length: 4, //ACTIVATION DEBUG MENU PASSAGE 3 => 4 ************
+        length: 3,
         child: SafeArea(
           child: Container(
             decoration: BoxDecoration(
@@ -245,8 +274,8 @@ class _HomePageState extends State<HomePage> {
                   ? Column(
                       children: [
                         orientation == Orientation.landscape
-                            ? mainBar()
-                            : mainBarVertical(screenWidth),
+                            ? mainBar(handleTap)
+                            : mainBarVertical(screenWidth, handleTap),
                         Expanded(
                           child: Padding(
                             padding: EdgeInsets.only(
@@ -258,10 +287,33 @@ class _HomePageState extends State<HomePage> {
                                 userSelected != null &&
                                         cursusUserSelected != null
                                     ? SingleChildScrollView(
-                                        child: MainProfile(
-                                          userSelected: userSelected!,
-                                          cursusUserSelected:
-                                              cursusUserSelected!,
+                                        child: Column(
+                                          children: [
+                                            GestureDetector(
+                                              onTap: handleTap(),
+                                              child: SizedBox(
+                                                child: MainProfile(
+                                                  debugMode: debugMenu,
+                                                  userSelected: userSelected!,
+                                                  cursusUserSelected:
+                                                      cursusUserSelected!,
+                                                ),
+                                              ),
+                                            ),
+                                            debugMenu
+                                                ? Column(
+                                                    children: [
+                                                      const SizedBox(
+                                                        height: 80,
+                                                      ),
+                                                      debugView(context),
+                                                      const SizedBox(
+                                                        height: 40,
+                                                      ),
+                                                    ],
+                                                  )
+                                                : const SizedBox.shrink(),
+                                          ],
                                         ),
                                       )
                                     : const Text(''),
@@ -274,8 +326,6 @@ class _HomePageState extends State<HomePage> {
                                         .toList(),
                                     orientation),
                                 skillsTab(context, orientation),
-                                debugView(context),
-                                //ACTIVATION DEBUG MENU DECOMMENTER ************
                               ],
                             ),
                           ),
@@ -299,7 +349,7 @@ class _HomePageState extends State<HomePage> {
                     Tab(text: 'Profile'),
                     Tab(text: 'Marks'),
                     Tab(text: 'Skills'),
-                    Tab(text: 'DebugApp'),
+                    // Tab(text: 'DebugApp'),
                     //ACTIVATION DEBUG MENU DECOMMENTER ************
                   ],
                 ),
@@ -311,29 +361,20 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Column mainBarVertical(double screenWidth) {
+  Column mainBarVertical(double screenWidth, Function handleTap) {
     return Column(
       children: [
-        searchBarTypeAheadField(),
         Row(
           children: [
             Expanded(
               flex: 4,
-              child: DropdownMenuCursus(
-                options: userSelected!.cursusUsers,
-                cursusDefault:
-                    userCursusDefaultLogic(userSelected?.cursusUsers ?? []),
-                onChanged: (CursusUser value) => {
-                  setState(() {
-                    cursusUserSelected = value;
-                  })
-                },
-              ),
+              child: searchBarTypeAheadField(),
             ),
             Expanded(
               flex: 1,
               child: ElevatedButton(
                   onPressed: () => logout(),
+                  onLongPress: () => {handleTap()},
                   style: ElevatedButton.styleFrom(
                     foregroundColor: Colors.white,
                     backgroundColor: Colors.blueGrey.shade700,
@@ -345,14 +386,24 @@ class _HomePageState extends State<HomePage> {
                     elevation: 5,
                   ),
                   child: const Icon(Icons.logout)),
-            )
+            ),
           ],
+        ),
+        DropdownMenuCursus(
+          options: userSelected!.cursusUsers,
+          cursusDefault:
+              userCursusDefaultLogic(userSelected?.cursusUsers ?? []),
+          onChanged: (CursusUser value) => {
+            setState(() {
+              cursusUserSelected = value;
+            })
+          },
         ),
       ],
     );
   }
 
-  Row mainBar() {
+  Row mainBar(Function handleTap) {
     return Row(
       children: [
         Expanded(flex: 5, child: searchBarTypeAheadField()),
@@ -373,6 +424,7 @@ class _HomePageState extends State<HomePage> {
           flex: 1,
           child: ElevatedButton(
               onPressed: () => logout(),
+              onLongPress: () => handleTap(),
               style: ElevatedButton.styleFrom(
                 foregroundColor: Colors.white,
                 backgroundColor: Colors.blueGrey.shade700,
