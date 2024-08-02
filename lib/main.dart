@@ -80,6 +80,12 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   @override
+  void didChangeDependencies() {
+    precacheImage(AssetImage('lib/assets/swiftyLogo2048.webp'), context);
+    super.didChangeDependencies();
+  }
+
+  @override
   void dispose() {
     _timer?.cancel();
     _authService.dispose();
@@ -135,13 +141,13 @@ class _MyHomePageState extends State<MyHomePage> {
                 orientation == Orientation.portrait
                     ? Image.asset(
                         isAntiAlias: true,
-                        'lib/assets/logoSwifty.webp',
+                        'lib/assets/swiftyLogo2048.webp',
                         fit: BoxFit.contain,
                       )
                     : Expanded(
                         child: Image.asset(
                           isAntiAlias: true,
-                          'lib/assets/logoSwiftyOld.webp',
+                          'lib/assets/swiftyLogo2048.webp',
                           fit: BoxFit.contain,
                         ),
                       ),

@@ -77,6 +77,8 @@ flutter:
     - ".env"
     - "lib/assets/placeholder.webp"
     - "lib/assets/logoSwifty.webp"
+    - "lib/assets/swiftyLogo2048.webp"
+    - "lib/assets/logoSwiftyOld.webp"
     - "lib/assets/iconSwifty.png"
 
   # An image asset can refer to one or more resolution-specific "variants", see

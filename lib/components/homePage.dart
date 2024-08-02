@@ -277,59 +277,54 @@ class _HomePageState extends State<HomePage> {
                                 padding: const EdgeInsets.fromLTRB(0, 0, 0, 8),
                                 child: mainBar(handleTap),
                               )
-                            : mainBarVertical(screenWidth, handleTap),
+                            : Padding(
+                                padding: const EdgeInsets.fromLTRB(0, 0, 0, 2),
+                                child: mainBarVertical(screenWidth, handleTap),
+                              ),
                         Expanded(
-                          child: Padding(
-                            padding: EdgeInsets.only(
-                                top: orientation == Orientation.portrait
-                                    ? topPadding + 0
-                                    : 0),
-                            child: TabBarView(
-                              children: <Widget>[
-                                userSelected != null &&
-                                        cursusUserSelected != null
-                                    ? SingleChildScrollView(
-                                        child: Column(
-                                          children: [
-                                            GestureDetector(
-                                              onTap: handleTap(),
-                                              child: SizedBox(
-                                                child: MainProfile(
-                                                  debugMode: debugMenu,
-                                                  userSelected: userSelected!,
-                                                  cursusUserSelected:
-                                                      cursusUserSelected!,
-                                                ),
+                          child: TabBarView(
+                            children: <Widget>[
+                              userSelected != null && cursusUserSelected != null
+                                  ? SingleChildScrollView(
+                                      child: Column(
+                                        children: [
+                                          GestureDetector(
+                                            onTap: handleTap(),
+                                            child: SizedBox(
+                                              child: MainProfile(
+                                                debugMode: debugMenu,
+                                                userSelected: userSelected!,
+                                                cursusUserSelected:
+                                                    cursusUserSelected!,
                                               ),
                                             ),
-                                            debugMenu
-                                                ? Column(
-                                                    children: [
-                                                      const SizedBox(
-                                                        height: 80,
-                                                      ),
-                                                      debugView(context),
-                                                      const SizedBox(
-                                                        height: 40,
-                                                      ),
-                                                    ],
-                                                  )
-                                                : const SizedBox.shrink(),
-                                          ],
-                                        ),
-                                      )
-                                    : const Text(''),
-                                projectsTab(
-                                    context,
-                                    userSelected!.projectsUsers
-                                        .where((elem) => elem.cursusIds
-                                            .contains(
-                                                cursusUserSelected!.cursusId))
-                                        .toList(),
-                                    orientation),
-                                skillsTab(context, orientation),
-                              ],
-                            ),
+                                          ),
+                                          debugMenu
+                                              ? Column(
+                                                  children: [
+                                                    const SizedBox(
+                                                      height: 80,
+                                                    ),
+                                                    debugView(context),
+                                                    const SizedBox(
+                                                      height: 40,
+                                                    ),
+                                                  ],
+                                                )
+                                              : const SizedBox.shrink(),
+                                        ],
+                                      ),
+                                    )
+                                  : const Text(''),
+                              projectsTab(
+                                  context,
+                                  userSelected!.projectsUsers
+                                      .where((elem) => elem.cursusIds.contains(
+                                          cursusUserSelected!.cursusId))
+                                      .toList(),
+                                  orientation),
+                              skillsTab(context, orientation),
+                            ],
                           ),
                         ),
                       ],
@@ -622,6 +617,18 @@ class _HomePageState extends State<HomePage> {
   }
 
   Center skillsTab(BuildContext context, Orientation orientation) {
+    double getPercentageCoef(double number) {
+      return number - number.toInt();
+    }
+
+    int getLevel(double number) {
+      return number.toInt();
+    }
+
+    int getPercentage(double number) {
+      return ((getPercentageCoef(number) * 100).round()).toInt();
+    }
+
     final childAspectRatio =
         orientation == Orientation.portrait ? 8 / 6 : 10 / 6;
     final crossAxisCount = orientation == Orientation.portrait ? 2 : 4;
@@ -665,10 +672,15 @@ class _HomePageState extends State<HomePage> {
                           overflow: TextOverflow.ellipsis,
                         ),
                         const SizedBox(height: 5),
-                        Text(
-                          data[index].toStringAsFixed(2),
-                          style: const TextStyle(
-                              fontSize: 16, color: Colors.white),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'Level ${getLevel(data[index])} - ${getPercentage(data[index])}%  ',
+                              style: const TextStyle(
+                                  fontSize: 16, color: Colors.white70),
+                            ),
+                          ],
                         ),
                       ],
                     ),
