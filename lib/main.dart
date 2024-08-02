@@ -90,7 +90,7 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       loading = true;
     });
-    _timer = Timer(const Duration(seconds: 30), () {
+    _timer = Timer(const Duration(seconds: 42), () {
       setState(() {
         loading = false;
       });
@@ -100,6 +100,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    Orientation orientation = MediaQuery.of(context).orientation;
     return StreamBuilder<ConnectivityResult>(
       stream: _connectivityStream,
       builder: (context, snapshot) {
@@ -114,38 +115,59 @@ class _MyHomePageState extends State<MyHomePage> {
           }
         }
         return Scaffold(
-          backgroundColor: Colors.blueGrey.shade900,
-          appBar: AppBar(
-            backgroundColor: Colors.transparent,
-            title: Center(
-              child: Text(
-                widget.title,
-                style: const TextStyle(color: Colors.white),
-              ),
-            ),
-          ),
+          backgroundColor: Colors.black12,
           body: Center(
-            child: loading == true
-                ? Center(
-                    child: LoadingAnimationWidget.hexagonDots(
-                        color: Colors.blueGrey, size: 200))
-                : ElevatedButton(
-                    onPressed: () => login42(),
-                    style: ElevatedButton.styleFrom(
-                      foregroundColor: Theme.of(context).primaryColorLight,
-                      backgroundColor: Theme.of(context).primaryColor,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 50, vertical: 15),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                const Column(
+                  children: [
+                    Text(
+                      'SWIFTY',
+                      style: TextStyle(color: Colors.white, fontSize: 34),
+                    ),
+                    Text(
+                      'COMPANION',
+                      style: TextStyle(color: Colors.white, fontSize: 26),
+                    ),
+                  ],
+                ),
+                orientation == Orientation.portrait
+                    ? Image.asset(
+                        isAntiAlias: true,
+                        'lib/assets/logoSwifty.webp',
+                        fit: BoxFit.contain,
+                      )
+                    : Expanded(
+                        child: Image.asset(
+                          isAntiAlias: true,
+                          'lib/assets/logoSwifty.webp',
+                          fit: BoxFit.contain,
+                        ),
                       ),
-                      elevation: 5,
-                    ),
-                    child: const Text(
-                      'Login 42',
-                      style: TextStyle(fontSize: 24),
-                    ),
-                  ),
+                loading == true
+                    ? Center(
+                        child: LoadingAnimationWidget.hexagonDots(
+                            color: Colors.blueGrey, size: 100))
+                    : ElevatedButton(
+                        onPressed: () => login42(),
+                        style: ElevatedButton.styleFrom(
+                          foregroundColor: Theme.of(context).primaryColorLight,
+                          backgroundColor: Theme.of(context).primaryColor,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 50, vertical: 15),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          elevation: 5,
+                        ),
+                        child: const Text(
+                          'Login 42',
+                          style: TextStyle(fontSize: 24),
+                        ),
+                      ),
+              ],
+            ),
           ),
         );
       },

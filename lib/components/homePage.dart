@@ -134,7 +134,10 @@ class _HomePageState extends State<HomePage> {
       });
     } catch (e) {
       print('Error: $e');
-      NavigatorService().navigateToAndRemoveAll('/login');
+      // NavigatorService().navigateToAndRemoveAll('/login');
+      setState(() {
+        loading = false;
+      });
     }
   }
 
