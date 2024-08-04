@@ -26,6 +26,9 @@ L'application doit :
 6. **Navigation** : Retour à la vue précédente
 7. **Mise en page flexible** : Adaptée à différentes tailles d'écran
 8. **Gestion des tokens** : Actualisation automatique du token quand il n'est plus valide
+
+
+
 ![image](https://github.com/user-attachments/assets/cab02aa5-11ea-43c9-a0a1-38467c419d5c)
 ![image](https://github.com/user-attachments/assets/e2ecb9cf-e0f5-4353-a255-d8551d620326)
 ![image](https://github.com/user-attachments/assets/e5e62191-88e5-4f2a-b811-d8fb9660fcb7)
