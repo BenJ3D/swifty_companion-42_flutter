@@ -180,13 +180,10 @@ class _HomePageState extends State<HomePage> {
       return [];
     }
     try {
-      Response response = await widget.dio.get(
-        '/v2/users',
-        queryParameters: {
-          'range[login]': '$pattern,${pattern}zz',
-          'per_page': '15'
-        },
-      );
+      Response response = await widget.dio.get('/v2/users', queryParameters: {
+        'range[login]': '$pattern,${pattern}zz',
+        'per_page': '15'
+      });
 
       List<UserSuggestion> suggestions = (response.data as List)
           .map((userData) => UserSuggestion.fromJson(userData))
@@ -462,13 +459,17 @@ class _HomePageState extends State<HomePage> {
           style: const TextStyle(color: Colors.white),
           cursorColor: Colors.white,
           onSubmitted: (String value) {
-            if (usersSuggestion.isNotEmpty &&
-                userSelected!.login.toString() != usersSuggestion.first.login) {
-              setState(() {
-                fetchDataUser(usersSuggestion.first.login);
-                controller.clear();
-              });
+            if (value.isNotEmpty) {
+              fetchDataUser(value);
+              controller.clear();
             }
+            // if (usersSuggestion.isNotEmpty &&
+            //     userSelected!.login.toString() != usersSuggestion.first.login) {
+            //   setState(() {
+            //     fetchDataUser(usersSuggestion.first.login);
+            //     controller.clear();
+            //   });
+            // }
           },
           controller: controller,
           focusNode: focusNode,
