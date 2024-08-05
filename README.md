@@ -12,7 +12,7 @@
 
 ---
 
-Bienvenue dans le projet "Compagnon Swifty" ! Ce projet, réalisé dans le cadre de l'école 42, a pour objectif de nous initier au développement mobile avec Flutter.
+Bienvenue dans le projet "Swifty Companion" ! Ce projet, réalisé dans le cadre de l'école 42, a pour objectif de nous initier au développement mobile avec Flutter.
 
 #### **Objectif du Projet**
 Créer une application mobile qui récupère et affiche des informations d'étudiants à partir de l'API 42. Voici les points clés :
