@@ -1,5 +1,6 @@
-### "Swifty Companion"
-
+<center>
+   <h1>"Swifty Companion"</h1>
+</center>
 
 <img src="https://github.com/user-attachments/assets/898a7d78-4711-4ca6-9921-bca9a6611b84" alt="Screenshot_20240805_144740" width="280">
 <img src="https://github.com/user-attachments/assets/e3a79850-ddca-4643-8f1f-e069bd3f15ae" alt="Screenshot_20240805_144745" width="280">
